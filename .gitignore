@@ -1,0 +1,9 @@
+testcases/
+build/
+bin/
+*.pptx
+output/
+mesh/
+.DS_Store
+OBJ-Models/
+
