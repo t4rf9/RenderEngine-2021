@@ -15,14 +15,6 @@ public:
 
     ~Scene();
 
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
-
     __host__ __device__ inline Camera *getCamera() const { return camera; }
 
     __device__ inline Vector3f getBackgroundColor() const { return background_color; }

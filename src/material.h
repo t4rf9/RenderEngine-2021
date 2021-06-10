@@ -17,14 +17,6 @@ public:
 
     virtual ~Material() = default;
 
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
-
     __device__ virtual Vector3f getSpecularColor() const;
 
     __device__ virtual Vector3f getDiffuseColor() const;

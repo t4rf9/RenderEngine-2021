@@ -16,14 +16,6 @@ public:
 
     explicit Object3D(Material *material);
 
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
-
     // Intersect Ray with this object. If hit, store information in hit structure.
     __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,
                                       curandState *rand_state) = 0;

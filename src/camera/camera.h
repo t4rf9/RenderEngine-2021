@@ -18,14 +18,6 @@ public:
     // Generate rays for each screen-space coordinate
     __device__ virtual Ray *generateRay(const Vector2f &point) = 0;
 
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
-
     __host__ __device__ inline int getWidth() const { return width; }
 
     __host__ __device__ inline int getHeight() const { return height; }

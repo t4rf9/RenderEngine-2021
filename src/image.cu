@@ -1,21 +1,5 @@
 #include "image.h"
 
-void *Image::operator new(std::size_t sz) {
-    void *res;
-    checkCudaErrors(cudaMallocManaged(&res, sz));
-    return res;
-}
-
-void *Image::operator new[](std::size_t sz) {
-    void *res;
-    checkCudaErrors(cudaMallocManaged(&res, sz));
-    return res;
-}
-
-void Image::operator delete(void *ptr) { checkCudaErrors(cudaFree(ptr)); }
-
-void Image::operator delete[](void *ptr) { checkCudaErrors(cudaFree(ptr)); }
-
 // some helper functions for save & load
 
 unsigned char ReadByte(FILE *file) {

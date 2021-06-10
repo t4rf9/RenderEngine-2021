@@ -20,14 +20,6 @@ public:
 
     ~Image() { delete[] data; }
 
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
-
     inline int Width() const { return width; }
 
     inline int Height() const { return height; }

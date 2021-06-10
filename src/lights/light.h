@@ -10,14 +10,6 @@ public:
 
     virtual ~Light() = default;
 
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
-
     __device__ virtual void getIllumination(const Vector3f &p, Vector3f &dir,
                                             Vector3f &col) const = 0;
 };

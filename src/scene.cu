@@ -13,19 +13,3 @@ Scene::~Scene() {
     }
     delete[] lights;
 }
-
-void *Scene::operator new(std::size_t sz) {
-    void *res;
-    checkCudaErrors(cudaMallocManaged(&res, sz));
-    return res;
-}
-
-void *Scene::operator new[](std::size_t sz) {
-    void *res;
-    checkCudaErrors(cudaMallocManaged(&res, sz));
-    return res;
-}
-
-void Scene::operator delete(void *ptr) { checkCudaErrors(cudaFree(ptr)); }
-
-void Scene::operator delete[](void *ptr) { checkCudaErrors(cudaFree(ptr)); }
