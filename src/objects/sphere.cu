@@ -1,18 +1,18 @@
 #include "sphere.h"
 
-Sphere::Sphere() : center(0), radius(1), radius_squared(1) {}
+Sphere::Sphere() : center(0.f), radius(1.f), radius_squared(1.f) {}
 
 Sphere::Sphere(const Vector3f &center, float radius, Material *material)
     : Object3D(material), center(center), radius(radius), radius_squared(radius * radius) {}
 
-bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min) {
+__device__ bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min, curandState *rand_state) {
     // origin lies anywhere
     Vector3f l = center - ray.getOrigin();
     bool inside = l.length() < radius;
     bool on = l.length() == radius;
 
     float tp = Vector3f::dot(l, ray.getDirection());
-    if (!inside && tp <= 0) {
+    if (!inside && tp <= 0.f) {
         return false;
     }
 

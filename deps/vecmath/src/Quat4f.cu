@@ -13,10 +13,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 // static
-const Quat4f Quat4f::ZERO = Quat4f(0, 0, 0, 0);
+const Quat4f Quat4f::ZERO = Quat4f(0.f, 0.f, 0.f, 0.f);
 
 // static
-const Quat4f Quat4f::IDENTITY = Quat4f(1, 0, 0, 0);
+const Quat4f Quat4f::IDENTITY = Quat4f(1.f, 0.f, 0.f, 0.f);
 
 __host__ __device__ Quat4f::Quat4f() {
     m_elements[0] = 0;

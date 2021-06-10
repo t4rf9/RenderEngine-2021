@@ -20,7 +20,7 @@ public:
     PerspectiveCamera(const Vector3f &pos, const Vector3f &direction, const Vector3f &up, int imgW,
                       int imgH, float angle);
 
-    Ray generateRay(const Vector2f &point) override;
+    __device__ Ray *generateRay(const Vector2f &point) override;
 
 protected:
     float angle;

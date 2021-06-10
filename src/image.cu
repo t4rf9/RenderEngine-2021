@@ -44,7 +44,7 @@ unsigned char ClampColorComponent(float c) {
     return (unsigned char)tmp;
 }
 
-__host__ __device__ void Image::SetAllPixels(const Vector3f &color) {
+__device__ void Image::SetAllPixels(const Vector3f &color) {
     for (int i = 0; i < width * height; ++i) {
         data[i] = color;
     }

@@ -16,7 +16,7 @@ public:
     virtual ~Camera() = default;
 
     // Generate rays for each screen-space coordinate
-    virtual Ray generateRay(const Vector2f &point) = 0;
+    __device__ virtual Ray *generateRay(const Vector2f &point) = 0;
 
     static void *operator new(std::size_t sz);
 
@@ -26,9 +26,9 @@ public:
 
     static void operator delete[](void *ptr);
 
-    inline int getWidth() const { return width; }
+    __host__ __device__ inline int getWidth() const { return width; }
 
-    inline int getHeight() const { return height; }
+    __host__ __device__ inline int getHeight() const { return height; }
 
 protected:
     // Extrinsic parameters

@@ -7,11 +7,12 @@ Plane::Plane(const Vector3f &normal, float d, Material *m) : Object3D(m), normal
     this->d /= norm;
 }
 
-bool Plane::intersect(const Ray &r, Hit &h, float tmin) {
-    float t = -(d + Vector3f::dot(normal, r.getOrigin())) / Vector3f::dot(normal, r.getDirection());
-    if (t <= tmin || t > h.getT()) {
+__device__ bool Plane::intersect(const Ray &ray, Hit &hit, float t_min, curandState *rand_state) {
+    float t =
+        -(d + Vector3f::dot(normal, ray.getOrigin())) / Vector3f::dot(normal, ray.getDirection());
+    if (t <= t_min || t > hit.getT()) {
         return false;
     }
-    h.set(t, material, normal);
+    hit.set(t, material, normal);
     return true;
 }

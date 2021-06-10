@@ -25,25 +25,25 @@ public:
 
     static void operator delete[](void *ptr);
 
-    virtual Vector3f getSpecularColor() const;
+    __device__ virtual Vector3f getSpecularColor() const;
 
-    virtual Vector3f getDiffuseColor() const;
+    __device__ virtual Vector3f getDiffuseColor() const;
 
-    Vector3f Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight,
-                   const Vector3f &lightColor);
+    __device__ Vector3f Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight,
+                              const Vector3f &lightColor);
 
-    inline bool reflective() const { return reflect_coefficient > 0; }
+    __device__ inline bool reflective() const { return reflect_coefficient > 0.f; }
 
-    inline bool refractive() const { return refract_coefficient > 0; }
+    __device__ inline bool refractive() const { return refract_coefficient > 0.f; }
 
-    inline float get_reflect_coefficient() const { return reflect_coefficient; }
+    __device__ inline float get_reflect_coefficient() const { return reflect_coefficient; }
 
-    inline float get_refract_coefficient() const { return refract_coefficient; }
+    __device__ inline float get_refract_coefficient() const { return refract_coefficient; }
 
-    inline float get_refractive_index() const { return refractive_index; }
+    __device__ inline float get_refractive_index() const { return refractive_index; }
 
 private:
-    inline float clamp(float f) const { return f > 0 ? f : 0; }
+    __device__ inline float clamp(float f) const { return f > 0.f ? f : 0.f; }
 
 protected:
     Vector3f diffuseColor;

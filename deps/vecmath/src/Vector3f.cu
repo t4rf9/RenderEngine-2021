@@ -11,16 +11,16 @@
 //////////////////////////////////////////////////////////////////////////
 
 // static
-const Vector3f Vector3f::ZERO = Vector3f(0, 0, 0);
+const Vector3f Vector3f::ZERO = Vector3f(0.f, 0.f, 0.f);
 
 // static
-const Vector3f Vector3f::UP = Vector3f(0, 1, 0);
+const Vector3f Vector3f::UP = Vector3f(0.f, 1.f, 0.f);
 
 // static
-const Vector3f Vector3f::RIGHT = Vector3f(1, 0, 0);
+const Vector3f Vector3f::RIGHT = Vector3f(1.f, 0.f, 0.f);
 
 // static
-const Vector3f Vector3f::FORWARD = Vector3f(0, 0, -1);
+const Vector3f Vector3f::FORWARD = Vector3f(0.f, 0.f, -1.f);
 
 __host__ __device__ Vector3f::Vector3f(float f) {
     m_elements[0] = f;

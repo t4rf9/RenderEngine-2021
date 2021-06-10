@@ -11,6 +11,7 @@
 #include "BoundingBox.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
+#include "cuda_error.h"
 #include "object3d.h"
 #include "triangle.h"
 
@@ -20,25 +21,14 @@ public:
 
     ~Mesh();
 
-    struct TriangleIndex {
-        TriangleIndex() {
-            x[0] = 0;
-            x[1] = 0;
-            x[2] = 0;
-        }
-        int &operator[](const int i) { return x[i]; }
-        // By Computer Graphics convention, counterclockwise winding is front face
-        int x[3]{};
-    };
-
-    std::vector<Vector3f> v;
-    std::vector<TriangleIndex> t;
-    std::vector<Vector3f> n;
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
+                              curandState *rand_state) override;
 
 private:
-    // Normal can be used for light estimation
-    void computeNormal();
+    int num_vertices;
+    int num_faces;
+    Vector3f *vertices;
+    Triangle **faces;
 
     BoundingBox *pBox;
 };

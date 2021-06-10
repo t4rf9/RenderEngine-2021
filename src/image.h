@@ -12,13 +12,13 @@
 // Simple image class
 class Image {
 public:
-    __host__ __device__ Image(int w, int h) {
+    Image(int w, int h) {
         width = w;
         height = h;
         data = new Vector3f[width * height];
     }
 
-    __host__ __device__ ~Image() { delete[] data; }
+    ~Image() { delete[] data; }
 
     static void *operator new(std::size_t sz);
 
@@ -28,11 +28,11 @@ public:
 
     static void operator delete[](void *ptr);
 
-    __host__ __device__ inline int Width() const { return width; }
+    inline int Width() const { return width; }
 
-    __host__ __device__ inline int Height() const { return height; }
+    inline int Height() const { return height; }
 
-    __host__ __device__ inline const Vector3f &GetPixel(int x, int y) const {
+    inline const Vector3f &GetPixel(int x, int y) const {
         assert(x >= 0 && x < width);
         assert(y >= 0 && y < height);
         return data[y * width + x];

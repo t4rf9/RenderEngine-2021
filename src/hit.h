@@ -9,26 +9,26 @@ class Material;
 class Hit {
 public:
     // constructors
-    Hit();
+    __device__ Hit();
 
-    Hit(float t, Material *m, const Vector3f &n);
+    __device__ Hit(float t, Material *m, const Vector3f &n);
 
-    Hit(const Hit &h) = default;
+    __device__ Hit(const Hit &h);
 
     // destructor
-    ~Hit() = default;
+    __device__ ~Hit();
 
-    inline float getT() const { return t; }
+    __device__ inline float getT() const { return t; }
 
-    inline void clear() { t = 1e38; }
+    __device__ inline void clear() { t = 1e38f; }
 
-    inline Material *getMaterial() const { return material; }
+    __device__ inline Material *getMaterial() const { return material; }
 
-    inline const Vector3f &getNormal() const { return normal; }
+    __device__ inline const Vector3f &getNormal() const { return normal; }
 
-    inline Vector3f &getNormal_var() { return normal; }
+    __device__ inline Vector3f &getNormal_var() { return normal; }
 
-    inline void set(float _t, Material *m, const Vector3f &n) {
+    __device__ inline void set(float _t, Material *m, const Vector3f &n) {
         t = _t;
         material = m;
         normal = n;
@@ -39,9 +39,10 @@ private:
     Material *material;
     Vector3f normal;
 };
-
+/*
 inline std::ostream &operator<<(std::ostream &os, const Hit &h) {
     auto n = h.getNormal();
     os << "Hit <" << h.getT() << ", (" << n[0] << ", " << n[1] << ", " << n[2] << ")>";
     return os;
 }
+*/

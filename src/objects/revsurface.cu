@@ -1,10 +1,5 @@
 #include "revsurface.h"
-
-std::default_random_engine RevSurface::generator;
-
-std::uniform_real_distribution<double> RevSurface::real_0_1_distribution{0, 1};
-
-std::uniform_real_distribution<double> RevSurface::real_10_distribution{-10, 10};
+#include <curand_kernel.h>
 
 RevSurface::RevSurface(Curve *pCurve, Material *material) : Object3D(material), pCurve(pCurve) {
     auto *curve_box = pCurve->get_bounding_box();
@@ -32,11 +27,9 @@ RevSurface::RevSurface(Curve *pCurve, Material *material) : Object3D(material), 
         pBound = new BoundingBox(min, max);
     } else {
         // Check flat.
-        for (const auto &cp : pCurve->getControls()) {
-            if (cp.z() != 0.0) {
-                printf("Profile of revSurface must be flat on xy plane.\n");
-                exit(0);
-            }
+        if (!pCurve->IsFlat()) {
+            printf("Profile of revSurface must be flat on xy plane.\n");
+            exit(0);
         }
     }
 }
@@ -46,10 +39,11 @@ RevSurface::~RevSurface() {
     delete pBound;
 }
 
-const int repeat_limit = 1000;
-const int iterate_limit = 500;
+__device__ const int repeat_limit = 1000;
+__device__ const int iterate_limit = 500;
 
-bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min) {
+__device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
+                                      curandState *rand_state) {
     // (PA3 optional TODO): implement this for the ray-tracing routine using G-N
     // iteration.
     Vector3f d = ray.getDirection();
@@ -65,27 +59,27 @@ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min) {
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        Vector3f x(t_min + real_0_1_distribution(generator), real_0_1_distribution(generator),
-                   real_10_distribution(generator));
+        Vector3f x(t_min + curand_uniform(rand_state), curand_uniform(rand_state),
+                   20.f * curand_uniform(rand_state) - 10.f);
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
 
         int count = 0;
-        while (count++ < iterate_limit && 0 <= u && u <= 1 && t >= t_min) {
+        while (count++ < iterate_limit && 0.f <= u && u <= 1.f && t >= t_min) {
             float v2 = v * v;
-            float divisor = 1 + v2;
-            float sinv = 2 * v / divisor;
-            float cosv = (1 - v2) / divisor;
+            float divisor = 1.f + v2;
+            float sinv = 2.f * v / divisor;
+            float cosv = (1.f - v2) / divisor;
             CurvePoint f = pCurve->curve_point_at_t(u);
             Vector3f F = o + t * d - Vector3f(cosv * f.V.x(), f.V.y(), sinv * f.V.x());
 
             Vector3f T_y = Vector3f(cosv * f.T.x(), f.T.y(), sinv * f.T.x());
-            if (F.length() < 1e-6) {
+            if (F.length() < 1e-6f) {
                 if (t <= t_min || t >= hit.getT()) {
                     break;
                 }
-                Vector3f T_xz = Vector3f(-sinv, 0, cosv);
+                Vector3f T_xz = Vector3f(-sinv, 0.f, cosv);
                 hit.set(t, material, Vector3f::cross(T_xz, T_y.normalized()));
                 res = true;
                 break;
@@ -93,7 +87,7 @@ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min) {
 
             Matrix3f F_prime = Matrix3f(
                 d, -T_y,
-                Vector3f((2 * sinv / divisor) * f.V[0], 0, -((2 * cosv) / divisor) * f.V[0]));
+                Vector3f((2.f * sinv / divisor) * f.V[0], 0.f, -((2.f * cosv) / divisor) * f.V[0]));
             Vector3f dx = F_prime.inverse() * F;
 
             x -= dx;

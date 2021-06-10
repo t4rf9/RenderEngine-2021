@@ -1,17 +1,14 @@
 #include "mesh.h"
 
-bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min) {
+__device__ bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min, curandState *rand_state) {
     if (!pBox->intersect(ray, t_min)) {
         return false;
     }
 
     // @TODO Optional: Change this brute force method into a faster one.
     bool result = false;
-    for (int triId = 0; triId < (int)t.size(); ++triId) {
-        TriangleIndex &triIndex = t[triId];
-        Triangle triangle(v[triIndex[0]], v[triIndex[1]], v[triIndex[2]], material);
-        triangle.setNormal(n[triId]);
-        result |= triangle.intersect(ray, hit, t_min);
+    for (int i = 0; i < num_faces; ++i) {
+        result |= faces[i]->intersect(ray, hit, t_min, rand_state);
     }
     return result;
 }
@@ -28,9 +25,11 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     std::string vTok("v");
     std::string fTok("f");
     std::string texTok("vt");
-    char bslash = '/', space = ' ';
     std::string tok;
     int texID;
+
+    std::vector<Vector3f> v;
+    std::vector<dim3> t;
     while (true) {
         std::getline(f, line);
         if (f.eof()) {
@@ -49,39 +48,49 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
             ss >> vec[0] >> vec[1] >> vec[2];
             v.push_back(vec);
         } else if (tok == fTok) {
-            if (line.find(bslash) != std::string::npos) {
-                std::replace(line.begin(), line.end(), bslash, space);
+            dim3 trig;
+            if (line.find('/') != std::string::npos) {
+                std::replace(line.begin(), line.end(), '/', ' ');
                 std::stringstream facess(line);
-                TriangleIndex trig;
                 facess >> tok;
-                for (int ii = 0; ii < 3; ii++) {
-                    facess >> trig[ii] >> texID;
-                    trig[ii]--;
-                }
-                t.push_back(trig);
+                facess >> trig.x >> texID;
+                facess >> trig.y >> texID;
+                facess >> trig.z >> texID;
             } else {
-                TriangleIndex trig;
-                for (int ii = 0; ii < 3; ii++) {
-                    ss >> trig[ii];
-                    trig[ii]--;
-                }
-                t.push_back(trig);
+                ss >> trig.x;
+                ss >> trig.y;
+                ss >> trig.z;
             }
+            trig.x -= 1;
+            trig.y -= 1;
+            trig.z -= 1;
+            t.push_back(trig);
         } else if (tok == texTok) {
             Vector2f texcoord;
             ss >> texcoord[0];
             ss >> texcoord[1];
         }
     }
-    computeNormal();
 
     f.close();
 
-    Vector3f min = v[0];
-    Vector3f max = v[0];
+    num_vertices = v.size();
+    num_faces = t.size();
 
-    for (int i = 1; i < v.size(); i++) {
-        auto &p = v[i];
+    checkCudaErrors(cudaMallocManaged(&vertices, num_vertices * sizeof(Vector3f)));
+    checkCudaErrors(cudaMallocManaged(&faces, num_faces * sizeof(Triangle *)));
+    for (int i = 0; i < num_vertices; i++) {
+        vertices[i] = v[i];
+    }
+    for (int i = 0; i < num_faces; i++) {
+        faces[i] = new Triangle(vertices[t[i].x], vertices[t[i].y], vertices[t[i].z], material);
+    }
+
+    Vector3f min = vertices[0];
+    Vector3f max = vertices[0];
+
+    for (int i = 1; i < num_vertices; i++) {
+        auto &p = vertices[i];
         for (int j = 0; j < 3; j++) {
             if (p[j] < min[j]) {
                 min[j] = p[j];
@@ -95,15 +104,8 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     pBox = new BoundingBox(min, max);
 }
 
-Mesh::~Mesh() { delete pBox; }
-
-void Mesh::computeNormal() {
-    n.resize(t.size());
-    for (int triId = 0; triId < (int)t.size(); ++triId) {
-        TriangleIndex &triIndex = t[triId];
-        Vector3f a = v[triIndex[1]] - v[triIndex[0]];
-        Vector3f b = v[triIndex[2]] - v[triIndex[0]];
-        b = Vector3f::cross(a, b);
-        n[triId] = b / b.length();
-    }
+Mesh::~Mesh() {
+    delete pBox;
+    checkCudaErrors(cudaFree(vertices));
+    checkCudaErrors(cudaFree(faces));
 }

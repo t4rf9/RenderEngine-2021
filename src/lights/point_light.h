@@ -12,7 +12,7 @@ public:
 
     ~PointLight() override = default;
 
-    void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override;
+    __device__ void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override;
 
 private:
     Vector3f position;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+#include "cuda_error.h"
 #include "hit.h"
 #include "object3d.h"
 #include "ray.h"
@@ -16,7 +17,8 @@ public:
 
     ~Group() override;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
+                              curandState *rand_state) override;
 
     void addObject(int index, Object3D *obj);
 

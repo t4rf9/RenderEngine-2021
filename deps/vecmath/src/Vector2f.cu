@@ -12,13 +12,13 @@
 //////////////////////////////////////////////////////////////////////////
 
 // static
-const Vector2f Vector2f::ZERO = Vector2f(0, 0);
+const Vector2f Vector2f::ZERO = Vector2f(0.f, 0.f);
 
 // static
-const Vector2f Vector2f::UP = Vector2f(0, 1);
+const Vector2f Vector2f::UP = Vector2f(0.f, 1.f);
 
 // static
-const Vector2f Vector2f::RIGHT = Vector2f(1, 0);
+const Vector2f Vector2f::RIGHT = Vector2f(1.f, 0.f);
 
 __host__ __device__ Vector2f::Vector2f(float f) {
     m_elements[0] = f;

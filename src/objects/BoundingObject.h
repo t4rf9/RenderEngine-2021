@@ -14,7 +14,7 @@ public:
 
     static void operator delete[](void *ptr);
 
-    virtual bool intersect(const Ray &ray, float t_min) = 0;
+    __device__ virtual bool intersect(const Ray &ray, float t_min) = 0;
 
 private:
 };

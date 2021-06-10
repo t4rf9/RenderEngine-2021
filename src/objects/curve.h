@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "BoundingBox.h"
+#include "cuda_error.h"
 #include "object3d.h"
 
 // PA3: Implement Bernstein class to compute spline basis function.
@@ -24,22 +25,26 @@ struct CurvePoint {
 
 class Curve : public Object3D {
 protected:
-    std::vector<Vector3f> controls;
+    Vector3f *controls;
+    int num_controls;
 
     BoundingBox *pBox;
 
 public:
-    explicit Curve(std::vector<Vector3f> points);
+    explicit Curve(const std::vector<Vector3f> &points);
 
     virtual ~Curve();
 
-    inline bool intersect(const Ray &r, Hit &h, float tmin) override { return false; }
+    __device__ inline bool intersect(const Ray &ray, Hit &hit, float t_min,
+                                     curandState *rand_state) override {
+        return false;
+    }
 
-    inline std::vector<Vector3f> &getControls() { return controls; }
+    bool IsFlat() const;
 
-    virtual void discretize(int resolution, std::vector<CurvePoint> &data) = 0;
+    //__device__ virtual void discretize(int resolution, std::vector<CurvePoint> &data) = 0;
 
-    virtual CurvePoint curve_point_at_t(double t) = 0;
+    __device__ virtual CurvePoint curve_point_at_t(float t) = 0;
 
     inline BoundingBox *get_bounding_box() { return pBox; }
 };

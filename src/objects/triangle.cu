@@ -11,7 +11,8 @@ Triangle::Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Mate
     normal.normalize();
 }
 
-bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min) {
+__device__ bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min,
+                                    curandState *rand_state) {
     Vector3f S = vertices[0] - ray.getOrigin();
     const Vector3f &Rd = ray.getDirection();
 
@@ -28,12 +29,12 @@ bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min) {
     }
 
     float b = mat2.determinant() / divisor;
-    if (b < 0 || b > 1) {
+    if (b < 0.f || b > 1.f) {
         return false;
     }
 
     float c = mat3.determinant() / divisor;
-    if (c < 0 || c > 1 || b + c > 1) {
+    if (c < 0.f || c > 1.f || b + c > 1.f) {
         return false;
     }
 

@@ -10,7 +10,7 @@ public:
 
     BoundingBox(const Vector3f &min, const Vector3f &max);
 
-    bool intersect(const Ray &ray, float t_min) override;
+    __device__ bool intersect(const Ray &ray, float t_min) override;
 
     inline const Vector3f &get_min() { return min; }
 

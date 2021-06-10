@@ -16,7 +16,8 @@ public:
 
     ~Plane() override = default;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
+                              curandState *rand_state) override;
 
 protected:
     Vector3f normal; // (a, b, c)

@@ -17,10 +17,10 @@
 #include <string>
 
 int main(int argc, char *argv[]) {
-    Ray ray(Vector3f(0, 0, 10), Vector3f(0, 0, -1), 0, 1, 1);
+    //Ray ray(Vector3f(0, 0, 10), Vector3f(0, 0, -1), 0, 1, 1);
 
-    BoundingBox box(Vector3f(-4, -2, -4), Vector3f(4, 2, 4));
+    //BoundingBox box(Vector3f(-4, -2, -4), Vector3f(4, 2, 4));
 
-    std::cout << box.intersect(ray, 0) << std::endl;
+    //std::cout << box.intersect(ray, 0) << std::endl;
     return 0;
 }

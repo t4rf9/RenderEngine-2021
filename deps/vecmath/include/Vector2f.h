@@ -72,7 +72,7 @@ public:
 
     __host__ __device__ static Vector3f cross(const Vector2f &v0, const Vector2f &v1);
 
-    // returns v0 * ( 1 - alpha ) * v1 * alpha
+    // returns v0 * ( 1 - alpha ) + v1 * alpha
     __host__ __device__ static Vector2f lerp(const Vector2f &v0, const Vector2f &v1, float alpha);
 
 private:

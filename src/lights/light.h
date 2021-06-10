@@ -18,5 +18,6 @@ public:
 
     static void operator delete[](void *ptr);
 
-    virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
+    __device__ virtual void getIllumination(const Vector3f &p, Vector3f &dir,
+                                            Vector3f &col) const = 0;
 };

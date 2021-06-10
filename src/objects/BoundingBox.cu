@@ -5,7 +5,7 @@ BoundingBox::BoundingBox(const Vector3f &min, const Vector3f &max) : min(min), m
     // std::cout << "max:\t(" << max[0] << ", " << max[1] << ", " << max[2] << ")\n" << std::endl;
 }
 
-bool BoundingBox::intersect(const Ray &ray, float t_min) {
+__device__ bool BoundingBox::intersect(const Ray &ray, float t_min) {
     const Vector3f &d = ray.getDirection();
     const Vector3f &o = ray.getOrigin();
 

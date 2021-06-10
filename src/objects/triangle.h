@@ -16,9 +16,10 @@ public:
     // a b c are three vertex positions of the triangle
     Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Material *m);
 
-    bool intersect(const Ray &ray, Hit &hit, float t_min) override;
+    __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
+                              curandState *rand_state) override;
 
-    inline void setNormal(const Vector3f &n) { normal = n; }
+    __device__ inline void setNormal(const Vector3f &n) { normal = n; }
 
 protected:
     Vector3f normal;

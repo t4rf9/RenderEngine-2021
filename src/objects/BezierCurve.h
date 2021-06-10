@@ -8,9 +8,9 @@ public:
 
     ~BezierCurve();
 
-    void discretize(int resolution, std::vector<CurvePoint> &data) override;
+    //__device__ void discretize(int resolution, std::vector<CurvePoint> &data) override;
 
-    CurvePoint curve_point_at_t(double t) override;
+    __device__ CurvePoint curve_point_at_t(float t) override;
 
 private:
     int n;
