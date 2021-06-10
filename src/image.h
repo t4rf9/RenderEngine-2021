@@ -15,10 +15,26 @@ public:
     Image(int w, int h) {
         width = w;
         height = h;
-        data = new Vector3f[width * height];
+        checkCudaErrors(cudaMallocManaged(&data, width * height * sizeof(Vector3f)));
     }
 
-    ~Image() { delete[] data; }
+    ~Image() { checkCudaErrors(cudaFree(data)); }
+
+    static void *operator new(std::size_t sz) {
+        void *res;
+        checkCudaErrors(cudaMallocManaged(&res, sz));
+        return res;
+    }
+
+    static void *operator new[](std::size_t sz) {
+        void *res;
+        checkCudaErrors(cudaMallocManaged(&res, sz));
+        return res;
+    }
+
+    static void operator delete(void *ptr) { checkCudaErrors(cudaFree(ptr)); }
+
+    static void operator delete[](void *ptr) { checkCudaErrors(cudaFree(ptr)); }
 
     inline int Width() const { return width; }
 

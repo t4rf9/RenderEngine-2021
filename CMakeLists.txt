@@ -13,65 +13,91 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 ADD_EXECUTABLE(main
-        src/camera/camera.h src/camera/camera.cu
-        src/objects/group.h src/objects/group.cu
-        src/lights/lights.h
-        src/lights/light.h src/lights/light.cu
-        src/lights/directional_light.h src/lights/directional_light.cu
-        src/lights/point_light.h src/lights/point_light.cu
-        src/material.h
-        src/objects/mesh.h src/objects/mesh.cu
-        src/objects/object3d.h src/objects/object3d.cu
-        src/objects/plane.h src/objects/plane.cu
-        src/objects/revsurface.h src/objects/revsurface.cu
-        src/objects/curve.h src/objects/curve.cu
-        src/objects/BezierCurve.h src/objects/BezierCurve.cu
-        src/objects/BsplineCurve.h src/objects/BsplineCurve.cu
-        src/objects/sphere.h src/objects/sphere.cu
-        src/objects/transform.h src/objects/transform.cu
-        src/objects/triangle.h src/objects/triangle.cu
-        src/objects/BoundingBox.h src/objects/BoundingBox.cu
-        src/objects/BoundingObject.h src/objects/BoundingObject.cu
-        src/hit.h src/hit.cu
+        src/device/camera/camera.h src/device/camera/camera.cu
+        src/device/camera/perspective_camera.cu src/device/camera/perspective_camera.h
+        src/device/camera/cameras.h
+        src/device/objects/group.h src/device/objects/group.cu
+        src/device/lights/lights.h
+        src/device/lights/light.h src/device/lights/light.cu
+        src/device/lights/directional_light.h src/device/lights/directional_light.cu
+        src/device/lights/point_light.h src/device/lights/point_light.cu
+        src/device/material.h src/device/material.cu
+        src/device/objects/mesh.h src/device/objects/mesh.cu
+        src/device/objects/object3d.h src/device/objects/object3d.cu
+        src/device/objects/plane.h src/device/objects/plane.cu
+        src/device/objects/revsurface.h src/device/objects/revsurface.cu
+        src/device/objects/curve.h src/device/objects/curve.cu
+        src/device/objects/BezierCurve.h src/device/objects/BezierCurve.cu
+        src/device/objects/BsplineCurve.h src/device/objects/BsplineCurve.cu
+        src/device/objects/sphere.h src/device/objects/sphere.cu
+        src/device/objects/transform.h src/device/objects/transform.cu
+        src/device/objects/triangle.h src/device/objects/triangle.cu
+        src/device/objects/BoundingBox.h src/device/objects/BoundingBox.cu
+        src/device/objects/BoundingObject.h src/device/objects/BoundingObject.cu
+        src/device/hit.h src/device/hit.cu
+        src/device/ray.h src/device/ray.cu
+
+        src/scene/scene_parser.h src/scene/scene_parser.cu
+        src/scene/scene.h src/scene/scene.cu
+        
+        src/scene/parameters/parameters.h
+        src/scene/parameters/camera_params.h
+        src/scene/parameters/lights_params.h
+        src/scene/parameters/light_params.h
+        src/scene/parameters/materials_params.h
+        src/scene/parameters/material_params.h
+
+        src/scene/parameters/objects/curve_params.h
+        src/scene/parameters/objects/group_params.h
+        src/scene/parameters/objects/mesh_params.h
+        src/scene/parameters/objects/plane_params.h
+        src/scene/parameters/objects/revsurface_params.h
+        src/scene/parameters/objects/sphere_params.h
+        src/scene/parameters/objects/transform_params.h
+        src/scene/parameters/objects/triangle_params.h
+        src/scene/parameters/objects/object_type.h
+        src/scene/parameters/objects/object_params_pointer.h
+
         src/image.h src/image.cu
-        src/ray.h src/ray.cu
-        src/scene_parser.h src/scene_parser.cu
-        src/scene.h src/scene.cu
         src/cuda_error.h src/cuda_error.cu
+        src/render.h src/render.cu
+
         src/main.cu
-        src/camera/perspective_camera.cu src/camera/perspective_camera.h
-        src/camera/cameras.h src/material.cu
         )
 
 ADD_EXECUTABLE(test
-        src/camera/camera.h src/camera/camera.cu
-        src/objects/group.h src/objects/group.cu
-        src/lights/lights.h
-        src/lights/light.h src/lights/light.cu
-        src/lights/directional_light.h src/lights/directional_light.cu
-        src/lights/point_light.h src/lights/point_light.cu
-        src/material.h
-        src/objects/mesh.h src/objects/mesh.cu
-        src/objects/object3d.h src/objects/object3d.cu
-        src/objects/plane.h src/objects/plane.cu
-        src/objects/revsurface.h src/objects/revsurface.cu
-        src/objects/curve.h src/objects/curve.cu
-        src/objects/BezierCurve.h src/objects/BezierCurve.cu
-        src/objects/BsplineCurve.h src/objects/BsplineCurve.cu
-        src/objects/sphere.h src/objects/sphere.cu
-        src/objects/transform.h src/objects/transform.cu
-        src/objects/triangle.h src/objects/triangle.cu
-        src/objects/BoundingBox.h src/objects/BoundingBox.cu
-        src/objects/BoundingObject.h src/objects/BoundingObject.cu
-        src/hit.h src/hit.cu
+        src/device/camera/camera.h src/device/camera/camera.cu
+        src/device/camera/perspective_camera.cu src/device/camera/perspective_camera.h
+        src/device/camera/cameras.h src/device/material.cu
+        src/device/objects/group.h src/device/objects/group.cu
+        src/device/lights/lights.h
+        src/device/lights/light.h src/device/lights/light.cu
+        src/device/lights/directional_light.h src/device/lights/directional_light.cu
+        src/device/lights/point_light.h src/device/lights/point_light.cu
+        src/device/material.h
+        src/device/objects/mesh.h src/device/objects/mesh.cu
+        src/device/objects/object3d.h src/device/objects/object3d.cu
+        src/device/objects/plane.h src/device/objects/plane.cu
+        src/device/objects/revsurface.h src/device/objects/revsurface.cu
+        src/device/objects/curve.h src/device/objects/curve.cu
+        src/device/objects/BezierCurve.h src/device/objects/BezierCurve.cu
+        src/device/objects/BsplineCurve.h src/device/objects/BsplineCurve.cu
+        src/device/objects/sphere.h src/device/objects/sphere.cu
+        src/device/objects/transform.h src/device/objects/transform.cu
+        src/device/objects/triangle.h src/device/objects/triangle.cu
+        src/device/objects/BoundingBox.h src/device/objects/BoundingBox.cu
+        src/device/objects/BoundingObject.h src/device/objects/BoundingObject.cu
+        src/device/hit.h src/device/hit.cu
+        src/device/ray.h src/device/ray.cu
+
         src/image.h src/image.cu
-        src/ray.h src/ray.cu
-        src/scene_parser.h src/scene_parser.cu
-        src/scene.h src/scene.cu
+        src/scene/scene_parser.h src/scene/scene_parser.cu
+        src/scene/scene.h src/scene/scene.cu
+
         src/cuda_error.h src/cuda_error.cu
+        src/render.h src/render.cu
+
         src/test.cu
-        src/camera/perspective_camera.cu src/camera/perspective_camera.h
-        src/camera/cameras.h src/material.cu
         )
 
 set_property(TARGET main PROPERTY CUDA_SEPARABLE_COMPILATION ON)
