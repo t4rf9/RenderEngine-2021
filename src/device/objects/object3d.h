@@ -1,5 +1,7 @@
 #pragma once
 
+#include "define.h"
+
 #include <curand_kernel.h>
 
 #include "device/hit.h"
@@ -17,7 +19,7 @@ public:
 
     // Intersect Ray with this object. If hit, store information in hit structure.
     __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,
-                                      curandState &rand_state) = 0;
+                                      RandState &rand_state) = 0;
 
 protected:
     Material *material;

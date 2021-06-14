@@ -15,7 +15,7 @@ __device__ Transform::Transform(const Matrix4f &m, Object3D *obj) : o(obj) {
 __device__ Transform::~Transform() {}
 
 __device__ bool Transform::intersect(const Ray &ray, Hit &hit, float t_min,
-                                     curandState &rand_state) {
+                                     RandState &rand_state) {
     Vector3f trSource = transformPoint(transform, ray.getOrigin());
     Vector3f trDirection = transformDirection(transform, ray.getDirection());
     float trDirLen = trDirection.normalize();

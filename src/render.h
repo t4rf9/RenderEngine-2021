@@ -2,6 +2,8 @@
 
 #include <curand_kernel.h>
 
+#include "define.h"
+
 #include <vecmath.h>
 
 #include "device/camera/cameras.h"
@@ -13,8 +15,6 @@
 #include "image.h"
 #include "scene/scene.h"
 
-const bool shadow = true;
-const bool reflect = true;
-const bool refract = true;
+#include <curand_kernel.h>
 
 __global__ void render(Image *image, Scene **p_scene);

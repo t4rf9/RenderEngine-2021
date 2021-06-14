@@ -1,6 +1,7 @@
 #include "BsplineCurve.h"
 
-__device__ BsplineCurve::BsplineCurve(Vector3f *points, int num_controls) : Curve(points, num_controls) {
+__device__ BsplineCurve::BsplineCurve(Vector3f *points, int num_controls)
+    : Curve(points, num_controls) {
     /*
     if (points.size() < 4) {
         printf("Number of control points of BspineCurve must be more than 4!\n");
@@ -46,7 +47,8 @@ __device__ CurvePoint BsplineCurve::curve_point_at_t(float t) {
         for (int q = k - p + 1; q <= n; q++) {
             B[p][q - k + p] =
                 (t - knots[q]) / (knots[q + p] - knots[q]) * B[p - 1][q - k + p - 1] +
-                (knots[q + p + 1] - t) / (knots[q + p + 1] - knots[q + 1]) * B[p - 1][q - k + p];
+                (knots[q + p + 1] - t) / (knots[q + p + 1] - knots[q + 1]) *
+                    B[p - 1][q - k + p];
         }
         B[p][n + 1 - k + p] =
             (t - knots[n + 1]) / (knots[n + 1 + p] - knots[n + 1]) * B[p - 1][n - k + p];
@@ -59,8 +61,9 @@ __device__ CurvePoint BsplineCurve::curve_point_at_t(float t) {
 
     Vector3f T = Vector3f(0.f);
     int q = 0;
-    T += controls[q] * k *
-         (0 / (knots[q + k] - knots[q]) - B[k - 1][q] / (knots[q + k + 1] - knots[q + 1]));
+    T +=
+        controls[q] * k *
+        (0 / (knots[q + k] - knots[q]) - B[k - 1][q] / (knots[q + k + 1] - knots[q + 1]));
     for (q = 1; q < n; q++) {
         T += controls[q] * k *
              (B[k - 1][q - 1] / (knots[q + k] - knots[q]) -

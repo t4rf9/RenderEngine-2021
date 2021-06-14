@@ -4,7 +4,7 @@
 
 class BsplineCurve : public Curve {
 public:
-    __device__ explicit BsplineCurve(Vector3f* points, int num_controls);
+    __device__ explicit BsplineCurve(Vector3f *points, int num_controls);
 
     __device__ ~BsplineCurve();
 

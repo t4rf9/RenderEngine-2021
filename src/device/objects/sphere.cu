@@ -9,7 +9,7 @@ __device__ Sphere::Sphere(const Vector3f &center, float radius, Material *materi
 __device__ Sphere::~Sphere() {}
 
 __device__ bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min,
-                                  curandState &rand_state) {
+                                  RandState &rand_state) {
     // origin lies anywhere
     Vector3f l = center - ray.getOrigin();
     bool inside = l.length() < radius;

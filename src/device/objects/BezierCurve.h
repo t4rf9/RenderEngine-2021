@@ -4,7 +4,7 @@
 
 class BezierCurve : public Curve {
 public:
-    __device__ explicit BezierCurve(Vector3f* points, int num_controls);
+    __device__ explicit BezierCurve(Vector3f *points, int num_controls);
 
     __device__ ~BezierCurve();
 

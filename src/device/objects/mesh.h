@@ -14,7 +14,7 @@ public:
     __device__ ~Mesh();
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState &rand_state) override;
+                              RandState &rand_state) override;
 
 private:
     int num_vertices;

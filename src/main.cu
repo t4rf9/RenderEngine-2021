@@ -1,3 +1,5 @@
+#include "define.h"
+
 #include "create_scene.h"
 #include "destroy_scene.h"
 #include "device/camera/cameras.h"

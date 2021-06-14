@@ -1,7 +1,7 @@
 #include "mesh.h"
 
 __device__ bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min,
-                                curandState &rand_state) {
+                                RandState &rand_state) {
     if (!pBox->intersect(ray, t_min)) {
         return false;
     }

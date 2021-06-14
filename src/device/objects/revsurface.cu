@@ -41,15 +41,15 @@ __device__ RevSurface::~RevSurface() {
     delete pBound;
 }
 
-__device__ const int repeat_limit = 10000;
-__device__ const int iterate_limit = 800;
+__device__ const int repeat_limit = 50000;
+__device__ const int iterate_limit = 500;
 
 //__device__ const float A[20] = {0.025f, 0.075f, 0.125f, 0.175f, 0.225f, 0.275f, 0.325f,
 // 0.375f, 0.425f, 0.475f, 0.525f, 0.575f, 0.625f, 0.675f, 0.725f, 0.775f, 0.825,
 // 0.875f, 0.925f, 0.975f};
 
 __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
-                                      curandState &rand_state) {
+                                      RandState &rand_state) {
     // PA3 optional: implement this for the ray-tracing routine using G-N
     // iteration.
     Vector3f d = ray.getDirection();
@@ -63,11 +63,8 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        // for (int j = 0; j < 20; j++) {
-        // for (int k = 0; k < 20; k++) {
         Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
                    20.f * curand_uniform(&rand_state) - 10.f);
-        // Vector3f x(t_min + A[i], A[j], 20.f * A[k] - 10.f);
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
@@ -99,8 +96,6 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
 
             x -= dx;
         }
-        //}
-        //}
     }
     return res;
 }

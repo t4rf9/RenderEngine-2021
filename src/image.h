@@ -1,5 +1,7 @@
 #pragma once
 
+#include "define.h"
+
 #include <vecmath.h>
 
 #include <cassert>
@@ -8,8 +10,6 @@
 #include <cstring>
 
 #include "cuda_error.h"
-
-const bool debug = true;
 
 // Simple image class
 class Image {

@@ -25,7 +25,7 @@ public:
     __device__ ~Transform() override;
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState &rand_state) override;
+                              RandState &rand_state) override;
 
     __device__ inline Object3D *getObject() const { return o; }
 

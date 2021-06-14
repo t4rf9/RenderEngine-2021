@@ -11,7 +11,7 @@ __device__ Group::~Group() {
 }
 
 __device__ bool Group::intersect(const Ray &ray, Hit &hit, float t_min,
-                                 curandState &rand_state) {
+                                 RandState &rand_state) {
     bool res = false;
     for (int i = 0; i < num_objects; i++) {
         if (objects[i] != nullptr && objects[i]->intersect(ray, hit, t_min, rand_state)) {

@@ -13,7 +13,7 @@ public:
     __device__ ~Group() override;
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState &rand_state) override;
+                              RandState &rand_state) override;
 
     __device__ void addObject(int index, Object3D *obj);
 
