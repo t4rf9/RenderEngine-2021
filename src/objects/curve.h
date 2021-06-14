@@ -33,7 +33,7 @@ public:
 
     virtual ~Curve();
 
-    inline bool intersect(const Ray &r, Hit &h, float tmin) override { return false; }
+    inline bool intersect(const Ray &r, Hit &h, float tmin, uint_fast32_t &rand) override { return false; }
 
     inline std::vector<Vector3f> &getControls() { return controls; }
 

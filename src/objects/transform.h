@@ -24,7 +24,7 @@ public:
 
     ~Transform() override = default;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    bool intersect(const Ray &r, Hit &h, float tmin, uint_fast32_t &rand) override;
 
 protected:
     Object3D *o;        // un-transformed object
