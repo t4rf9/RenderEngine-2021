@@ -2,6 +2,6 @@
 
 struct PlaneParams {
     Vector3f normal;
-    Vector3f d;
+    float d;
     int material_id;
 };

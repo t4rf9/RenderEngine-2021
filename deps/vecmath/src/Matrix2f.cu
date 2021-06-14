@@ -21,7 +21,8 @@ __host__ __device__ Matrix2f::Matrix2f(float m00, float m01, float m10, float m1
     m_elements[3] = m11;
 }
 
-__host__ __device__ Matrix2f::Matrix2f(const Vector2f &v0, const Vector2f &v1, bool setColumns) {
+__host__ __device__ Matrix2f::Matrix2f(const Vector2f &v0, const Vector2f &v1,
+                                       bool setColumns) {
     if (setColumns) {
         setCol(0, v0);
         setCol(1, v1);
@@ -46,7 +47,9 @@ __host__ __device__ const float &Matrix2f::operator()(int i, int j) const {
     return m_elements[j * 2 + i];
 }
 
-__host__ __device__ float &Matrix2f::operator()(int i, int j) { return m_elements[j * 2 + i]; }
+__host__ __device__ float &Matrix2f::operator()(int i, int j) {
+    return m_elements[j * 2 + i];
+}
 
 __host__ __device__ Vector2f Matrix2f::getRow(int i) const {
     return Vector2f(m_elements[i], m_elements[i + 2]);
@@ -71,7 +74,8 @@ __host__ __device__ void Matrix2f::setCol(int j, const Vector2f &v) {
 }
 
 __host__ __device__ float Matrix2f::determinant() {
-    return Matrix2f::determinant2x2(m_elements[0], m_elements[2], m_elements[1], m_elements[3]);
+    return Matrix2f::determinant2x2(m_elements[0], m_elements[2], m_elements[1],
+                                    m_elements[3]);
 }
 
 __host__ __device__ Matrix2f Matrix2f::inverse(bool *pbIsSingular, float epsilon) {
@@ -90,9 +94,10 @@ __host__ __device__ Matrix2f Matrix2f::inverse(bool *pbIsSingular, float epsilon
 
         float reciprocalDeterminant = 1.0f / determinant;
 
-        return Matrix2f(
-            m_elements[3] * reciprocalDeterminant, -m_elements[2] * reciprocalDeterminant,
-            -m_elements[1] * reciprocalDeterminant, m_elements[0] * reciprocalDeterminant);
+        return Matrix2f(m_elements[3] * reciprocalDeterminant,
+                        -m_elements[2] * reciprocalDeterminant,
+                        -m_elements[1] * reciprocalDeterminant,
+                        m_elements[0] * reciprocalDeterminant);
     }
 }
 
@@ -116,7 +121,8 @@ void Matrix2f::print() {
 }
 
 // static
-__host__ __device__ float Matrix2f::determinant2x2(float m00, float m01, float m10, float m11) {
+__host__ __device__ float Matrix2f::determinant2x2(float m00, float m01, float m10,
+                                                   float m11) {
     return (m00 * m11 - m01 * m10);
 }
 

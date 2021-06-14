@@ -9,13 +9,14 @@ class Vector2f;
 class Matrix2f {
 public:
     // Fill a 2x2 matrix with "fill", default to 0.
-    __host__ __device__ Matrix2f(float fill = 0.f);
+    __host__ __device__ explicit Matrix2f(float fill = 0.f);
 
     __host__ __device__ Matrix2f(float m00, float m01, float m10, float m11);
 
     // setColumns = true ==> sets the columns of the matrix to be [v0 v1]
     // otherwise, sets the rows
-    __host__ __device__ Matrix2f(const Vector2f &v0, const Vector2f &v1, bool setColumns = true);
+    __host__ __device__ Matrix2f(const Vector2f &v0, const Vector2f &v1,
+                                 bool setColumns = true);
 
     __host__ __device__ Matrix2f(const Matrix2f &rm);            // copy constructor
     __host__ __device__ Matrix2f &operator=(const Matrix2f &rm); // assignment operator
@@ -45,7 +46,8 @@ public:
     operator float *(); // automatic type conversion for GL
     void print();
 
-    __host__ __device__ static float determinant2x2(float m00, float m01, float m10, float m11);
+    __host__ __device__ static float determinant2x2(float m00, float m01, float m10,
+                                                    float m11);
 
     __host__ __device__ static Matrix2f ones();
 

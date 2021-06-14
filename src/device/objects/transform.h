@@ -22,10 +22,12 @@ public:
      */
     __device__ Transform(const Matrix4f &m, Object3D *obj);
 
-    __device__ ~Transform() override = default;
+    __device__ ~Transform() override;
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState *rand_state) override;
+                              curandState &rand_state) override;
+
+    __device__ inline Object3D *getObject() const { return o; }
 
 protected:
     Object3D *o;        // un-transformed object

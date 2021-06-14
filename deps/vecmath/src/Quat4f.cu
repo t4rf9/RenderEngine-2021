@@ -40,12 +40,10 @@ __host__ __device__ Quat4f::Quat4f(const Quat4f &rq) {
 }
 
 __host__ __device__ Quat4f &Quat4f::operator=(const Quat4f &rq) {
-    if (this != (&rq)) {
-        m_elements[0] = rq.m_elements[0];
-        m_elements[1] = rq.m_elements[1];
-        m_elements[2] = rq.m_elements[2];
-        m_elements[3] = rq.m_elements[3];
-    }
+    m_elements[0] = rq.m_elements[0];
+    m_elements[1] = rq.m_elements[1];
+    m_elements[2] = rq.m_elements[2];
+    m_elements[3] = rq.m_elements[3];
     return (*this);
 }
 
@@ -124,7 +122,9 @@ __host__ __device__ void Quat4f::invert() {
     m_elements[3] = inverse.m_elements[3];
 }
 
-__host__ __device__ Quat4f Quat4f::inverse() const { return conjugated() * (1.0f / absSquared()); }
+__host__ __device__ Quat4f Quat4f::inverse() const {
+    return conjugated() * (1.0f / absSquared());
+}
 
 __host__ __device__ Quat4f Quat4f::log() const {
     float len = sqrt(m_elements[1] * m_elements[1] + m_elements[2] * m_elements[2] +
@@ -134,7 +134,8 @@ __host__ __device__ Quat4f Quat4f::log() const {
         return Quat4f(0, m_elements[1], m_elements[2], m_elements[3]);
     } else {
         float coeff = acos(m_elements[0]) / len;
-        return Quat4f(0, m_elements[1] * coeff, m_elements[2] * coeff, m_elements[3] * coeff);
+        return Quat4f(0, m_elements[1] * coeff, m_elements[2] * coeff,
+                      m_elements[3] * coeff);
     }
 }
 
@@ -174,8 +175,8 @@ __host__ __device__ void Quat4f::setAxisAngle(float radians, const Vector3f &axi
 }
 
 void Quat4f::print() {
-    printf("< %.4f + %.4f i + %.4f j + %.4f k >\n", m_elements[0], m_elements[1], m_elements[2],
-           m_elements[3]);
+    printf("< %.4f + %.4f i + %.4f j + %.4f k >\n", m_elements[0], m_elements[1],
+           m_elements[2], m_elements[3]);
 }
 
 // static
@@ -218,8 +219,8 @@ __host__ __device__ Quat4f Quat4f::slerp(const Quat4f &a, const Quat4f &b, float
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::squad(const Quat4f &a, const Quat4f &tanA, const Quat4f &tanB,
-                                         const Quat4f &b, float t) {
+__host__ __device__ Quat4f Quat4f::squad(const Quat4f &a, const Quat4f &tanA,
+                                         const Quat4f &tanB, const Quat4f &b, float t) {
     Quat4f ab = Quat4f::slerp(a, b, t);
     Quat4f tangent = Quat4f::slerp(tanA, tanB, t, false);
     return Quat4f::slerp(ab, tangent, 2.0f * t * (1.0f - t), false);
@@ -227,7 +228,8 @@ __host__ __device__ Quat4f Quat4f::squad(const Quat4f &a, const Quat4f &tanA, co
 
 // static
 __host__ __device__ Quat4f Quat4f::cubicInterpolate(const Quat4f &q0, const Quat4f &q1,
-                                                    const Quat4f &q2, const Quat4f &q3, float t) {
+                                                    const Quat4f &q2, const Quat4f &q3,
+                                                    float t) {
     // geometric construction:
     //            t
     //   (t+1)/2     t/2
@@ -254,7 +256,8 @@ __host__ __device__ Quat4f Quat4f::logDifference(const Quat4f &a, const Quat4f &
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::squadTangent(const Quat4f &before, const Quat4f &center,
+__host__ __device__ Quat4f Quat4f::squadTangent(const Quat4f &before,
+                                                const Quat4f &center,
                                                 const Quat4f &after) {
     Quat4f l1 = Quat4f::logDifference(center, before);
     Quat4f l2 = Quat4f::logDifference(center, after);

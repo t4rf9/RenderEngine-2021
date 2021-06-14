@@ -12,27 +12,58 @@ __device__ bool BoundingBox::intersect(const Ray &ray, float t_min) {
         return true;
     }
     */
+    float t;
 
-    for (int i = 0; i < 3; i++) {
-        if (d[i] != 0) {
-            float t = (min[i] - o[i]) / d[i];
-            if (t > t_min) {
-                Vector3f p = ray.pointAtParameter(t);
-                if (min <= p && p <= max) {
-                    return true;
-                }
+    if (d[0] != 0) {
+        t = (min[0] - o[0]) / d[0];
+        if (t > t_min) {
+            Vector3f p = o + d * t;
+            if (min[1] <= p[1] && min[2] <= p[2] && p[1] <= max[1] && p[2] <= max[2]) {
+                return true;
+            }
+        }
+
+        t = (max[0] - o[0]) / d[0];
+        if (t > t_min) {
+            Vector3f p = o + d * t;
+            if (min[1] <= p[1] && min[2] <= p[2] && p[1] <= max[1] && p[2] <= max[2]) {
+                return true;
             }
         }
     }
 
-    for (int i = 0; i < 3; i++) {
-        if (d[i] != 0) {
-            float t = (max[i] - o[i]) / d[i];
-            if (t > t_min) {
-                Vector3f p = ray.pointAtParameter(t);
-                if (min <= p && p <= max) {
-                    return true;
-                }
+    if (d[1] != 0) {
+        t = (min[1] - o[1]) / d[1];
+        if (t > t_min) {
+            Vector3f p = o + d * t;
+            if (min[0] <= p[0] && min[2] <= p[2] && p[0] <= max[0] && p[2] <= max[2]) {
+                return true;
+            }
+        }
+
+        t = (max[1] - o[1]) / d[1];
+        if (t > t_min) {
+            Vector3f p = o + d * t;
+            if (min[0] <= p[0] && min[2] <= p[2] && p[0] <= max[0] && p[2] <= max[2]) {
+                return true;
+            }
+        }
+    }
+
+    if (d[2] != 0) {
+        t = (min[2] - o[2]) / d[2];
+        if (t > t_min) {
+            Vector3f p = o + d * t;
+            if (min[0] <= p[0] && min[1] <= p[1] && p[0] <= max[0] && p[1] <= max[1]) {
+                return true;
+            }
+        }
+
+        t = (max[2] - o[2]) / d[2];
+        if (t > t_min) {
+            Vector3f p = o + d * t;
+            if (min[0] <= p[0] && min[1] <= p[1] && p[0] <= max[0] && p[1] <= max[1]) {
+                return true;
             }
         }
     }

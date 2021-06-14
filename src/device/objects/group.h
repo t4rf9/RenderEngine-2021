@@ -13,9 +13,11 @@ public:
     __device__ ~Group() override;
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState *rand_state) override;
+                              curandState &rand_state) override;
 
     __device__ void addObject(int index, Object3D *obj);
+
+    __device__ inline Object3D *getObject(int index) const { return objects[index]; }
 
     __device__ inline int getGroupSize() { return num_objects; }
 

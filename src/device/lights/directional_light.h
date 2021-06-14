@@ -8,15 +8,16 @@ class DirectionalLight : public Light {
 public:
     __device__ DirectionalLight() = delete;
 
-    __device__ DirectionalLight(const Vector3f &d, const Vector3f &c);
+    __device__ DirectionalLight(const Vector3f &direction, const Vector3f &color);
 
-    __device__ ~DirectionalLight() override = default;
+    __device__ ~DirectionalLight() override;
 
     /**
      * @param p unsed in this function
      * @param distanceToLight not well defined because it's not a point light
      */
-    __device__ void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override;
+    __device__ void getIllumination(const Vector3f &p, Vector3f &dir,
+                                    Vector3f &col) const override;
 
 private:
     Vector3f direction;

@@ -36,6 +36,8 @@ public:
 
     inline MaterialsParams *getMaterialsParams() const { return materials_params; }
 
+    inline GroupParams *getBaseGroupParams() const { return base_group_params; }
+
 private:
     void parseFile();
 
@@ -50,7 +52,7 @@ private:
     void parseMaterials();
     void parsePhongMaterial(MaterialParams *material_params);
 
-    void parseObject(char token[MAX_PARSER_TOKEN_LENGTH], ObjectParamsPointer object,
+    void parseObject(char token[MAX_PARSER_TOKEN_LENGTH], ObjectParamsPointer *object,
                      ObjectType *object_type);
     void parseGroup(GroupParams *group_params);
     void parseSphere(SphereParams *sphere_params);

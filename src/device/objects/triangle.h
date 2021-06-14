@@ -12,7 +12,7 @@ public:
     __device__ Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Material *m);
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState *rand_state) override;
+                              curandState &rand_state) override;
 
     __device__ inline void setNormal(const Vector3f &n) { normal = n; }
 

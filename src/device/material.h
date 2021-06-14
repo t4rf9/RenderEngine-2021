@@ -12,14 +12,15 @@
 
 class Material {
 public:
-    __device__ explicit Material(const Vector3f &d_color, const Vector3f &s_color, float shininess,
-                      float reflect_coefficient, float refract_coefficient, float refractive_index);
+    __device__ explicit Material(const Vector3f &d_color, const Vector3f &s_color,
+                                 float shininess, float reflect_coefficient,
+                                 float refract_coefficient, float refractive_index);
 
-    __device__ virtual ~Material() = default;
+    __device__ ~Material();
 
-    __device__ virtual Vector3f getSpecularColor() const;
+    __device__ Vector3f getSpecularColor() const;
 
-    __device__ virtual Vector3f getDiffuseColor() const;
+    __device__ Vector3f getDiffuseColor() const;
 
     __device__ Vector3f Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight,
                               const Vector3f &lightColor);
@@ -28,9 +29,13 @@ public:
 
     __device__ inline bool refractive() const { return refract_coefficient > 0.f; }
 
-    __device__ inline float get_reflect_coefficient() const { return reflect_coefficient; }
+    __device__ inline float get_reflect_coefficient() const {
+        return reflect_coefficient;
+    }
 
-    __device__ inline float get_refract_coefficient() const { return refract_coefficient; }
+    __device__ inline float get_refract_coefficient() const {
+        return refract_coefficient;
+    }
 
     __device__ inline float get_refractive_index() const { return refractive_index; }
 

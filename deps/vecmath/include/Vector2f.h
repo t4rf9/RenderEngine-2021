@@ -11,7 +11,7 @@ public:
     static const Vector2f UP;
     static const Vector2f RIGHT;
 
-    __host__ __device__ Vector2f(float f = 0.f);
+    __host__ __device__ explicit Vector2f(float f = 0.f);
 
     __host__ __device__ Vector2f(float x, float y);
 
@@ -73,7 +73,8 @@ public:
     __host__ __device__ static Vector3f cross(const Vector2f &v0, const Vector2f &v1);
 
     // returns v0 * ( 1 - alpha ) + v1 * alpha
-    __host__ __device__ static Vector2f lerp(const Vector2f &v0, const Vector2f &v1, float alpha);
+    __host__ __device__ static Vector2f lerp(const Vector2f &v0, const Vector2f &v1,
+                                             float alpha);
 
 private:
     float m_elements[2];

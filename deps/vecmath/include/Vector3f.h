@@ -10,7 +10,7 @@ public:
     static const Vector3f RIGHT;
     static const Vector3f FORWARD;
 
-    __host__ __device__ Vector3f(float f = 0.f);
+    __host__ __device__ explicit Vector3f(float f = 0.f);
 
     __host__ __device__ Vector3f(float x, float y, float z);
 
@@ -86,14 +86,16 @@ public:
 
     // computes the linear interpolation between v0 and v1 by alpha \in [0,1]
     // returns v0 * ( 1 - alpha ) * v1 * alpha
-    __host__ __device__ static Vector3f lerp(const Vector3f &v0, const Vector3f &v1, float alpha);
+    __host__ __device__ static Vector3f lerp(const Vector3f &v0, const Vector3f &v1,
+                                             float alpha);
 
     // computes the cubic catmull-rom interpolation between p0, p1, p2, p3
     // by t \in [0,1].  Guarantees that at t = 0, the result is p0 and
     // at p1, the result is p2.
-    __host__ __device__ static Vector3f cubicInterpolate(const Vector3f &p0, const Vector3f &p1,
-                                                         const Vector3f &p2, const Vector3f &p3,
-                                                         float t);
+    __host__ __device__ static Vector3f cubicInterpolate(const Vector3f &p0,
+                                                         const Vector3f &p1,
+                                                         const Vector3f &p2,
+                                                         const Vector3f &p3, float t);
 
 private:
     float m_elements[3];

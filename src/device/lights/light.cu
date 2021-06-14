@@ -1,1 +1,5 @@
-#include "lights/light.h"
+#include "light.h"
+
+__device__ Light::Light() {}
+
+__device__ Light::~Light() {}

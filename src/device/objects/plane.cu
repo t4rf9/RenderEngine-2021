@@ -8,9 +8,12 @@ __device__ Plane::Plane(const Vector3f &normal, float d, Material *m)
     this->d /= norm;
 }
 
-__device__ bool Plane::intersect(const Ray &ray, Hit &hit, float t_min, curandState *rand_state) {
-    float t =
-        -(d + Vector3f::dot(normal, ray.getOrigin())) / Vector3f::dot(normal, ray.getDirection());
+__device__ Plane::~Plane() {}
+
+__device__ bool Plane::intersect(const Ray &ray, Hit &hit, float t_min,
+                                 curandState &rand_state) {
+    float t = -(d + Vector3f::dot(normal, ray.getOrigin())) /
+              Vector3f::dot(normal, ray.getDirection());
     if (t <= t_min || t > hit.getT()) {
         return false;
     }

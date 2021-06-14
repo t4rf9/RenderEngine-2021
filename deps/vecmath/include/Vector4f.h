@@ -7,11 +7,11 @@ class Vector3f;
 
 class Vector4f {
 public:
-    __host__ __device__ Vector4f(float f = 0.f);
+    __host__ __device__ explicit Vector4f(float f = 0.f);
 
     __host__ __device__ Vector4f(float fx, float fy, float fz, float fw);
 
-    __host__ __device__ Vector4f(float buffer[4]);
+    __host__ __device__ explicit Vector4f(float buffer[4]);
 
     __host__ __device__ Vector4f(const Vector2f &xy, float z, float w);
 
@@ -100,7 +100,8 @@ public:
 
     __host__ __device__ static float dot(const Vector4f &v0, const Vector4f &v1);
 
-    __host__ __device__ static Vector4f lerp(const Vector4f &v0, const Vector4f &v1, float alpha);
+    __host__ __device__ static Vector4f lerp(const Vector4f &v0, const Vector4f &v1,
+                                             float alpha);
 
 private:
     float m_elements[4];

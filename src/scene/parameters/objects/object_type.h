@@ -1,3 +1,3 @@
 #pragma once
 
-enum ObjectType { Triangle, Sphere, Plane, Mesh, RevSurface, Transform, Group, Curve };
+enum ObjectType { TRIANGLE, SPHERE, PLANE, MESH, REVSURFACE, TRANSFORM, GROUP, CURVE };

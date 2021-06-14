@@ -12,7 +12,7 @@ __device__ Triangle::Triangle(const Vector3f &a, const Vector3f &b, const Vector
 }
 
 __device__ bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min,
-                                    curandState *rand_state) {
+                                    curandState &rand_state) {
     Vector3f S = vertices[0] - ray.getOrigin();
     const Vector3f &Rd = ray.getDirection();
 

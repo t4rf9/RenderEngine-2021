@@ -78,16 +78,16 @@ __host__ __device__ Vector4f::Vector4f(const Vector4f &rv) {
 }
 
 __host__ __device__ Vector4f &Vector4f::operator=(const Vector4f &rv) {
-    if (this != &rv) {
-        m_elements[0] = rv.m_elements[0];
-        m_elements[1] = rv.m_elements[1];
-        m_elements[2] = rv.m_elements[2];
-        m_elements[3] = rv.m_elements[3];
-    }
+    m_elements[0] = rv.m_elements[0];
+    m_elements[1] = rv.m_elements[1];
+    m_elements[2] = rv.m_elements[2];
+    m_elements[3] = rv.m_elements[3];
     return *this;
 }
 
-__host__ __device__ const float &Vector4f::operator[](int i) const { return m_elements[i]; }
+__host__ __device__ const float &Vector4f::operator[](int i) const {
+    return m_elements[i];
+}
 
 __host__ __device__ float &Vector4f::operator[](int i) { return m_elements[i]; }
 
@@ -107,13 +107,21 @@ __host__ __device__ float Vector4f::z() const { return m_elements[2]; }
 
 __host__ __device__ float Vector4f::w() const { return m_elements[3]; }
 
-__host__ __device__ Vector2f Vector4f::xy() const { return Vector2f(m_elements[0], m_elements[1]); }
+__host__ __device__ Vector2f Vector4f::xy() const {
+    return Vector2f(m_elements[0], m_elements[1]);
+}
 
-__host__ __device__ Vector2f Vector4f::yz() const { return Vector2f(m_elements[1], m_elements[2]); }
+__host__ __device__ Vector2f Vector4f::yz() const {
+    return Vector2f(m_elements[1], m_elements[2]);
+}
 
-__host__ __device__ Vector2f Vector4f::zw() const { return Vector2f(m_elements[2], m_elements[3]); }
+__host__ __device__ Vector2f Vector4f::zw() const {
+    return Vector2f(m_elements[2], m_elements[3]);
+}
 
-__host__ __device__ Vector2f Vector4f::wx() const { return Vector2f(m_elements[3], m_elements[0]); }
+__host__ __device__ Vector2f Vector4f::wx() const {
+    return Vector2f(m_elements[3], m_elements[0]);
+}
 
 __host__ __device__ Vector3f Vector4f::xyz() const {
     return Vector3f(m_elements[0], m_elements[1], m_elements[2]);
@@ -168,8 +176,8 @@ __host__ __device__ void Vector4f::normalize() {
 
 __host__ __device__ Vector4f Vector4f::normalized() const {
     float length = abs();
-    return Vector4f(m_elements[0] / length, m_elements[1] / length, m_elements[2] / length,
-                    m_elements[3] / length);
+    return Vector4f(m_elements[0] / length, m_elements[1] / length,
+                    m_elements[2] / length, m_elements[3] / length);
 }
 
 __host__ __device__ void Vector4f::homogenize() {
@@ -212,7 +220,8 @@ __host__ __device__ float Vector4f::dot(const Vector4f &v0, const Vector4f &v1) 
 }
 
 // static
-__host__ __device__ Vector4f Vector4f::lerp(const Vector4f &v0, const Vector4f &v1, float alpha) {
+__host__ __device__ Vector4f Vector4f::lerp(const Vector4f &v0, const Vector4f &v1,
+                                            float alpha) {
     return alpha * (v1 - v0) + v0;
 }
 
@@ -256,4 +265,6 @@ __host__ __device__ bool operator==(const Vector4f &v0, const Vector4f &v1) {
     return (v0.x() == v1.x() && v0.y() == v1.y() && v0.z() == v1.z() && v0.w() == v1.w());
 }
 
-__host__ __device__ bool operator!=(const Vector4f &v0, const Vector4f &v1) { return !(v0 == v1); }
+__host__ __device__ bool operator!=(const Vector4f &v0, const Vector4f &v1) {
+    return !(v0 == v1);
+}

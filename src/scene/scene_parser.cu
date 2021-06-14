@@ -11,16 +11,24 @@
 
 #define DegreesToRadians(x) (M_PI * (x) / 180.0f)
 
+const bool debug = true;
+
 SceneParser::SceneParser(const char *filename) {
     // initialize some reasonable default values
 
     checkCudaErrors(cudaMallocManaged(&camera_params, sizeof(CameraParams)));
+    if (debug)
+        printf("camera_params:\t0x%lx\n", camera_params);
 
     checkCudaErrors(cudaMallocManaged(&lights_params, sizeof(LightsParams)));
     lights_params->num_lights = 0;
+    if (debug)
+        printf("lights_params:\t0x%lx\n", lights_params);
 
     checkCudaErrors(cudaMallocManaged(&materials_params, sizeof(MaterialsParams)));
     materials_params->num_materials = 0;
+    if (debug)
+        printf("materials_params:\t0x%lx\n", materials_params);
 
     // parse the file
     assert(filename != nullptr);
@@ -48,14 +56,10 @@ SceneParser::SceneParser(const char *filename) {
 SceneParser::~SceneParser() {
     checkCudaErrors(cudaFree(camera_params));
 
-    for (int i = 0; i < lights_params->num_lights; i++) {
-        checkCudaErrors(cudaFree(lights_params->lights));
-    }
+    checkCudaErrors(cudaFree(lights_params->lights));
     checkCudaErrors(cudaFree(lights_params));
 
-    for (int i = 0; i < materials_params->num_materials; i++) {
-        checkCudaErrors(cudaFree(materials_params->materials));
-    }
+    checkCudaErrors(cudaFree(materials_params->materials));
     checkCudaErrors(cudaFree(materials_params));
 
     freeBaseGroupParams();
@@ -65,6 +69,8 @@ SceneParser::~SceneParser() {
 // ====================================================================
 
 void SceneParser::parseFile() {
+    if (debug)
+        printf("SceneParser::parseFile()\n");
     //
     // at the top level, the scene can have a camera,
     // background color and a group of objects
@@ -82,6 +88,8 @@ void SceneParser::parseFile() {
             parseMaterials();
         } else if (!strcmp(token, "Group")) {
             checkCudaErrors(cudaMallocManaged(&base_group_params, sizeof(GroupParams)));
+            if (debug)
+                printf("base_group_params:\t0x%lx\n", base_group_params);
             parseGroup(base_group_params);
         } else {
             printf("Unknown token in parseFile: '%s'\n", token);
@@ -94,6 +102,7 @@ void SceneParser::parseFile() {
 // ====================================================================
 
 void SceneParser::parsePerspectiveCamera() {
+    printf("SceneParser::parsePerspectiveCamera()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the camera parameters
     getToken(token);
@@ -131,6 +140,8 @@ void SceneParser::parsePerspectiveCamera() {
 }
 
 void SceneParser::parseBackground() {
+    if (debug)
+        printf("SceneParser::parseBackground()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the background color
     getToken(token);
@@ -154,6 +165,8 @@ void SceneParser::parseBackground() {
 // ====================================================================
 
 void SceneParser::parseLights() {
+    if (debug)
+        printf("SceneParser::parseLights()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -164,6 +177,8 @@ void SceneParser::parseLights() {
     lights_params->num_lights = readInt();
     checkCudaErrors(cudaMallocManaged(&lights_params->lights,
                                       lights_params->num_lights * sizeof(LightParams)));
+    if (debug)
+        printf("lights_params->lights:\t0x%lx\n", lights_params->lights);
 
     // read in the objects
     int count = 0;
@@ -184,6 +199,8 @@ void SceneParser::parseLights() {
 }
 
 void SceneParser::parseDirectionalLight(LightParams *light_param) {
+    if (debug)
+        printf("SceneParser::parseDirectionalLight()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
 
     getToken(token);
@@ -204,6 +221,8 @@ void SceneParser::parseDirectionalLight(LightParams *light_param) {
 }
 
 void SceneParser::parsePointLight(LightParams *light_param) {
+    if (debug)
+        printf("SceneParser::parsePointLight()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
 
     getToken(token);
@@ -226,6 +245,8 @@ void SceneParser::parsePointLight(LightParams *light_param) {
 // ====================================================================
 
 void SceneParser::parseMaterials() {
+    if (debug)
+        printf("SceneParser::parseMaterials()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -237,6 +258,8 @@ void SceneParser::parseMaterials() {
     checkCudaErrors(
         cudaMallocManaged(&materials_params->materials,
                           materials_params->num_materials * sizeof(MaterialParams)));
+    if (debug)
+        printf("materials_params->materials:\t0x%lx\n", materials_params->materials);
 
     // read in the objects
     int count = 0;
@@ -256,6 +279,8 @@ void SceneParser::parseMaterials() {
 }
 
 void SceneParser::parsePhongMaterial(MaterialParams *material_params) {
+    if (debug)
+        printf("SceneParser::parsePhongMaterial()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
@@ -298,34 +323,43 @@ void SceneParser::parsePhongMaterial(MaterialParams *material_params) {
 // ====================================================================
 
 void SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH],
-                              ObjectParamsPointer object, ObjectType *object_type) {
+                              ObjectParamsPointer *object, ObjectType *object_type) {
     if (!strcmp(token, "Group")) {
-        *object_type = ObjectType::Group;
-        parseGroup(object.group);
+        *object_type = ObjectType::GROUP;
+        checkCudaErrors(cudaMallocManaged(&object->group, sizeof(GroupParams)));
+        parseGroup(object->group);
     } else if (!strcmp(token, "Sphere")) {
-        *object_type = ObjectType::Sphere;
-        parseSphere(object.sphere);
+        *object_type = ObjectType::SPHERE;
+        checkCudaErrors(cudaMallocManaged(&object->sphere, sizeof(SphereParams)));
+        parseSphere(object->sphere);
     } else if (!strcmp(token, "Plane")) {
-        *object_type = ObjectType::Plane;
-        parsePlane(object.plane);
+        *object_type = ObjectType::PLANE;
+        checkCudaErrors(cudaMallocManaged(&object->plane, sizeof(PlaneParams)));
+        parsePlane(object->plane);
     } else if (!strcmp(token, "Triangle")) {
-        *object_type = ObjectType::Triangle;
-        parseTriangle(object.triangle);
+        *object_type = ObjectType::TRIANGLE;
+        checkCudaErrors(cudaMallocManaged(&object->triangle, sizeof(TriangleParams)));
+        parseTriangle(object->triangle);
     } else if (!strcmp(token, "TriangleMesh")) {
-        *object_type = ObjectType::Mesh;
-        parseTriangleMesh(object.mesh);
+        *object_type = ObjectType::MESH;
+        checkCudaErrors(cudaMallocManaged(&object->mesh, sizeof(MeshParams)));
+        parseTriangleMesh(object->mesh);
     } else if (!strcmp(token, "Transform")) {
-        *object_type = ObjectType::Transform;
-        parseTransform(object.transform);
+        *object_type = ObjectType::TRANSFORM;
+        checkCudaErrors(cudaMallocManaged(&object->transform, sizeof(TransformParams)));
+        parseTransform(object->transform);
     } else if (!strcmp(token, "BezierCurve")) {
-        *object_type = ObjectType::Curve;
-        parseBezierCurve(object.curve);
+        *object_type = ObjectType::CURVE;
+        checkCudaErrors(cudaMallocManaged(&object->curve, sizeof(CurveParams)));
+        parseBezierCurve(object->curve);
     } else if (!strcmp(token, "BsplineCurve")) {
-        *object_type = ObjectType::Curve;
-        parseBsplineCurve(object.curve);
+        *object_type = ObjectType::CURVE;
+        checkCudaErrors(cudaMallocManaged(&object->curve, sizeof(CurveParams)));
+        parseBsplineCurve(object->curve);
     } else if (!strcmp(token, "RevSurface")) {
-        *object_type = ObjectType::RevSurface;
-        parseRevSurface(object.revsurface);
+        *object_type = ObjectType::REVSURFACE;
+        checkCudaErrors(cudaMallocManaged(&object->revsurface, sizeof(RevsurfaceParams)));
+        parseRevSurface(object->revsurface);
     } else {
         printf("Unknown token in parseObject: '%s'\n", token);
         exit(0);
@@ -336,6 +370,8 @@ void SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH],
 // ====================================================================
 
 void SceneParser::parseGroup(GroupParams *group_params) {
+    if (debug)
+        printf("SceneParser::parseGroup(0x%lx)\n", group_params);
     //
     // each group starts with an integer that specifies
     // the number of objects in the group
@@ -347,31 +383,42 @@ void SceneParser::parseGroup(GroupParams *group_params) {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
+    // printf("\t%s\n", token);
 
     // read in the number of objects
     getToken(token);
     assert(!strcmp(token, "numObjects"));
+    // printf("\t%s\n", token);
+
     group_params->num_objects = readInt();
     checkCudaErrors(cudaMallocManaged(
         &group_params->objects, group_params->num_objects * sizeof(ObjectParamsPointer)));
+    // printf("\tgroup_params->objects:\t0x%lx\n", group_params->objects);
     checkCudaErrors(cudaMallocManaged(&group_params->object_types,
                                       group_params->num_objects * sizeof(ObjectType)));
+    // printf("\tgroup_params->object_types:\t0x%lx\n", group_params->object_types);
 
     // read in the objects
     int count = 0;
     while (count < group_params->num_objects) {
         getToken(token);
+        // printf("\t%s\n", token);
         if (!strcmp(token, "MaterialIndex")) {
             // change the current material
             current_material = readInt();
             assert(0 <= current_material &&
                    current_material <= materials_params->num_materials);
         } else {
-            parseObject(token, group_params->objects[count],
+            // printf("\t&group_params->objects[count]:\t0x%lx\n",
+            //&group_params->objects[count]);
+            // printf("\t&group_params->object_types[count]:\t0x%lx\n",
+            //&group_params->object_types[count]);
+            parseObject(token, &group_params->objects[count],
                         &group_params->object_types[count]);
 
             count++;
         }
+        // printf("\n");
     }
     getToken(token);
     assert(!strcmp(token, "}"));
@@ -381,6 +428,8 @@ void SceneParser::parseGroup(GroupParams *group_params) {
 // ====================================================================
 
 void SceneParser::parseSphere(SphereParams *sphere_params) {
+    if (debug)
+        printf("SceneParser::parseSphere(0x%lx)\n", sphere_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -401,6 +450,8 @@ void SceneParser::parseSphere(SphereParams *sphere_params) {
 }
 
 void SceneParser::parsePlane(PlaneParams *plane_params) {
+    if (debug)
+        printf("SceneParser::parsePlane(0x%lx)\n", plane_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -421,6 +472,8 @@ void SceneParser::parsePlane(PlaneParams *plane_params) {
 }
 
 void SceneParser::parseTriangle(TriangleParams *triangle_params) {
+    if (debug)
+        printf("SceneParser::parseTriangle(0x%lx)\n", triangle_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -445,6 +498,8 @@ void SceneParser::parseTriangle(TriangleParams *triangle_params) {
 }
 
 void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
+    if (debug)
+        printf("SceneParser::parseMesh(0x%lx)\n", mesh_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
 
@@ -464,6 +519,7 @@ void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
     assert(!strcmp(ext, ".obj"));
 
     // parse obj model
+    // @TODO Optional: Use tiny obj loader to replace this simple one.
     std::ifstream f;
     f.open(filename);
     if (!f.is_open()) {
@@ -528,17 +584,19 @@ void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
 
     checkCudaErrors(cudaMallocManaged(&mesh_params->vertices,
                                       mesh_params->num_vertices * sizeof(Vector3f)));
-    checkCudaErrors(
-        cudaMallocManaged(&mesh_params->faces, mesh_params->num_faces * sizeof(dim3)));
+    checkCudaErrors(cudaMallocManaged(&mesh_params->face_indices,
+                                      mesh_params->num_faces * sizeof(dim3)));
 
     thrust::copy(v.begin(), v.end(), mesh_params->vertices);
-    thrust::copy(t.begin(), t.end(), mesh_params->faces);
+    thrust::copy(t.begin(), t.end(), mesh_params->face_indices);
 
     assert(current_material != -1);
     mesh_params->material_id = current_material;
 }
 
 void SceneParser::parseBezierCurve(CurveParams *curve_params) {
+    if (debug)
+        printf("SceneParser::parseBezierCurve(0x%lx)\n", curve_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -564,11 +622,15 @@ void SceneParser::parseBezierCurve(CurveParams *curve_params) {
     curve_params->num_controls = controls.size();
     checkCudaErrors(cudaMallocManaged(&curve_params->controls,
                                       curve_params->num_controls * sizeof(Vector3f)));
-    thrust::copy(controls.begin(), controls.end(), curve_params->num_controls);
+    if (debug)
+        printf("curve_params->controls:\t0x%lx\n", curve_params->controls);
+    thrust::copy(controls.begin(), controls.end(), curve_params->controls);
     curve_params->type = CurveParams::Type::Bezier;
 }
 
 void SceneParser::parseBsplineCurve(CurveParams *curve_params) {
+    if (debug)
+        printf("SceneParser::parseBsplineCurve(0x%lx)\n", curve_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -594,11 +656,15 @@ void SceneParser::parseBsplineCurve(CurveParams *curve_params) {
     curve_params->num_controls = controls.size();
     checkCudaErrors(cudaMallocManaged(&curve_params->controls,
                                       curve_params->num_controls * sizeof(Vector3f)));
-    thrust::copy(controls.begin(), controls.end(), curve_params->num_controls);
+    if (debug)
+        printf("curve_params->controls:\t0x%lx\n", curve_params->controls);
+    thrust::copy(controls.begin(), controls.end(), curve_params->controls);
     curve_params->type = CurveParams::Type::BSpline;
 }
 
 void SceneParser::parseRevSurface(RevsurfaceParams *revsurface_params) {
+    if (debug)
+        printf("SceneParser::parseRevSurface(0x%lx)\n", revsurface_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -608,8 +674,16 @@ void SceneParser::parseRevSurface(RevsurfaceParams *revsurface_params) {
 
     getToken(token);
     if (!strcmp(token, "BezierCurve")) {
+        checkCudaErrors(
+            cudaMallocManaged(&revsurface_params->curve, sizeof(CurveParams)));
+        if (debug)
+            printf("revsurface_params->curve:\t0x%lx\n", revsurface_params->curve);
         parseBezierCurve(revsurface_params->curve);
     } else if (!strcmp(token, "BsplineCurve")) {
+        checkCudaErrors(
+            cudaMallocManaged(&revsurface_params->curve, sizeof(CurveParams)));
+        if (debug)
+            printf("revsurface_params->curve:\t0x%lx\n", revsurface_params->curve);
         parseBsplineCurve(revsurface_params->curve);
     } else {
         printf("Unknown profile type in parseRevSurface: '%s'\n", token);
@@ -624,6 +698,8 @@ void SceneParser::parseRevSurface(RevsurfaceParams *revsurface_params) {
 }
 
 void SceneParser::parseTransform(TransformParams *transform_params) {
+    if (debug)
+        printf("SceneParser::parseTransform(0x%lx)\n", transform_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
 
     auto &matrix = transform_params->matrix;
@@ -677,7 +753,7 @@ void SceneParser::parseTransform(TransformParams *transform_params) {
         } else {
             // otherwise this must be an object,
             // and there are no more transformations
-            parseObject(token, transform_params->object, &transform_params->object_type);
+            parseObject(token, &transform_params->object, &transform_params->object_type);
             break;
         }
         getToken(token);
@@ -688,6 +764,8 @@ void SceneParser::parseTransform(TransformParams *transform_params) {
 }
 
 void SceneParser::freeBaseGroupParams() {
+    if (debug)
+        printf("SceneParser::freeBaseGroupParams()\n");
     if (base_group_params == nullptr) {
         return;
     }
@@ -698,60 +776,86 @@ void SceneParser::freeBaseGroupParams() {
     while (!S_group.empty()) {
         GroupParams *group = S_group.top();
         S_group.pop();
+        if (debug)
+            printf("Group*:\t0x%lx\n", group);
 
         for (int i = 0; i < group->num_objects; i++) {
             ObjectParamsPointer &object = group->objects[i];
             switch (group->object_types[i]) {
-            case ObjectType::Triangle:
+            case ObjectType::TRIANGLE:
+                if (debug)
+                    printf("Triangle*:\t0x%lx\n", object.triangle);
                 checkCudaErrors(cudaFree(object.triangle));
                 break;
-            case ObjectType::Sphere:
+            case ObjectType::SPHERE:
+                if (debug)
+                    printf("Sphere*:\t0x%lx\n", object.sphere);
                 checkCudaErrors(cudaFree(object.sphere));
                 break;
-            case ObjectType::Plane:
+            case ObjectType::PLANE:
+                if (debug)
+                    printf("Plane*:\t0x%lx\n", object.plane);
                 checkCudaErrors(cudaFree(object.plane));
                 break;
-            case ObjectType::Mesh:
+            case ObjectType::MESH:
+                if (debug)
+                    printf("MESH*:\t0x%lx\n", object.mesh);
                 checkCudaErrors(cudaFree(object.mesh->vertices));
-                checkCudaErrors(cudaFree(object.mesh->faces));
+                checkCudaErrors(cudaFree(object.mesh->face_indices));
                 checkCudaErrors(cudaFree(object.mesh));
                 break;
-            case ObjectType::RevSurface:
+            case ObjectType::REVSURFACE:
+                if (debug)
+                    printf("RevSurface*:\t0x%lx\n", object.revsurface);
                 checkCudaErrors(cudaFree(object.revsurface->curve->controls));
                 checkCudaErrors(cudaFree(object.revsurface->curve));
                 checkCudaErrors(cudaFree(object.revsurface));
                 break;
-            case ObjectType::Transform:
+            case ObjectType::TRANSFORM: {
                 TransformParams *transform = object.transform;
 
-                while (transform->object_type == ObjectType::Transform) {
+                while (transform->object_type == ObjectType::TRANSFORM) {
                     TransformParams *prev = transform;
                     transform = prev->object.transform;
+                    if (debug)
+                        printf("Transform*:\t0x%lx\n", prev);
                     checkCudaErrors(cudaFree(prev));
                 }
 
                 switch (transform->object_type) {
-                case ObjectType::Triangle:
+                case ObjectType::TRIANGLE:
+                    if (debug)
+                        printf("Triangle*:\t0x%lx\n", transform->object.triangle);
                     checkCudaErrors(cudaFree(transform->object.triangle));
                     break;
-                case ObjectType::Sphere:
+                case ObjectType::SPHERE:
+                    if (debug)
+                        printf("Sphere*:\t0x%lx\n", transform->object.sphere);
                     checkCudaErrors(cudaFree(transform->object.sphere));
                     break;
-                case ObjectType::Plane:
+                case ObjectType::PLANE:
+                    if (debug)
+                        printf("Plane*:\t0x%lx\n", transform->object.plane);
                     checkCudaErrors(cudaFree(transform->object.plane));
                     break;
-                case ObjectType::Mesh:
+                case ObjectType::MESH:
+                    if (debug)
+                        printf("Mesh*:\t0x%lx\n", transform->object.mesh);
                     checkCudaErrors(cudaFree(transform->object.mesh->vertices));
-                    checkCudaErrors(cudaFree(transform->object.mesh->faces));
+                    checkCudaErrors(cudaFree(transform->object.mesh->face_indices));
                     checkCudaErrors(cudaFree(transform->object.mesh));
                     break;
-                case ObjectType::RevSurface:
+                case ObjectType::REVSURFACE:
+                    if (debug)
+                        printf("RevSurface*:\t0x%lx\n", transform->object.revsurface);
                     checkCudaErrors(
                         cudaFree(transform->object.revsurface->curve->controls));
                     checkCudaErrors(cudaFree(transform->object.revsurface->curve));
                     checkCudaErrors(cudaFree(transform->object.revsurface));
                     break;
-                case ObjectType::Group:
+                case ObjectType::GROUP:
+                    if (debug)
+                        printf("Group*:\t0x%lx\n", transform->object.group);
                     S_group.push(transform->object.group);
                     break;
                 default:
@@ -761,10 +865,15 @@ void SceneParser::freeBaseGroupParams() {
                     break;
                 }
 
+                if (debug)
+                    printf("Transform*:\t0x%lx\n", transform);
                 checkCudaErrors(cudaFree(transform));
 
                 break;
-            case ObjectType::Group:
+            }
+            case ObjectType::GROUP:
+                if (debug)
+                    printf("Group*:\t0x%lx\n", object.group);
                 S_group.push(object.group);
                 break;
             default:
@@ -802,6 +911,7 @@ Vector3f SceneParser::readVector3f() {
         printf("Error trying to read 3 floats to make a Vector3f\n");
         assert(0);
     }
+    // printf("\t%f, %f, %f\n", x, y, z);
     return Vector3f(x, y, z);
 }
 
@@ -812,6 +922,7 @@ float SceneParser::readFloat() {
         printf("Error trying to read 1 float\n");
         assert(0);
     }
+    // printf("\t%f\n", answer);
     return answer;
 }
 
@@ -822,6 +933,7 @@ double SceneParser::readDouble() {
         printf("Error trying to read 1 float\n");
         assert(0);
     }
+    // printf("\t%lf\n", answer);
     return answer;
 }
 
@@ -832,5 +944,6 @@ int SceneParser::readInt() {
         printf("Error trying to read 1 int\n");
         assert(0);
     }
+    // printf("\t%d\n", answer);
     return answer;
 }

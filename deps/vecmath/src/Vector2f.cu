@@ -36,14 +36,14 @@ __host__ __device__ Vector2f::Vector2f(const Vector2f &rv) {
 }
 
 __host__ __device__ Vector2f &Vector2f::operator=(const Vector2f &rv) {
-    if (this != &rv) {
-        m_elements[0] = rv[0];
-        m_elements[1] = rv[1];
-    }
+    m_elements[0] = rv[0];
+    m_elements[1] = rv[1];
     return *this;
 }
 
-__host__ __device__ const float &Vector2f::operator[](int i) const { return m_elements[i]; }
+__host__ __device__ const float &Vector2f::operator[](int i) const {
+    return m_elements[i];
+}
 
 __host__ __device__ float &Vector2f::operator[](int i) { return m_elements[i]; }
 
@@ -57,11 +57,17 @@ __host__ __device__ float Vector2f::y() const { return m_elements[1]; }
 
 __host__ __device__ Vector2f Vector2f::xy() const { return *this; }
 
-__host__ __device__ Vector2f Vector2f::yx() const { return Vector2f(m_elements[1], m_elements[0]); }
+__host__ __device__ Vector2f Vector2f::yx() const {
+    return Vector2f(m_elements[1], m_elements[0]);
+}
 
-__host__ __device__ Vector2f Vector2f::xx() const { return Vector2f(m_elements[0], m_elements[0]); }
+__host__ __device__ Vector2f Vector2f::xx() const {
+    return Vector2f(m_elements[0], m_elements[0]);
+}
 
-__host__ __device__ Vector2f Vector2f::yy() const { return Vector2f(m_elements[1], m_elements[1]); }
+__host__ __device__ Vector2f Vector2f::yy() const {
+    return Vector2f(m_elements[1], m_elements[1]);
+}
 
 __host__ __device__ Vector2f Vector2f::normal() const {
     return Vector2f(-m_elements[1], m_elements[0]);
@@ -124,7 +130,8 @@ __host__ __device__ Vector3f Vector2f::cross(const Vector2f &v0, const Vector2f 
 }
 
 // static
-__host__ __device__ Vector2f Vector2f::lerp(const Vector2f &v0, const Vector2f &v1, float alpha) {
+__host__ __device__ Vector2f Vector2f::lerp(const Vector2f &v0, const Vector2f &v1,
+                                            float alpha) {
     return alpha * (v1 - v0) + v0;
 }
 
@@ -148,7 +155,9 @@ __host__ __device__ Vector2f operator/(const Vector2f &v0, const Vector2f &v1) {
     return Vector2f(v0.x() / v1.x(), v0.y() / v1.y());
 }
 
-__host__ __device__ Vector2f operator-(const Vector2f &v) { return Vector2f(-v.x(), -v.y()); }
+__host__ __device__ Vector2f operator-(const Vector2f &v) {
+    return Vector2f(-v.x(), -v.y());
+}
 
 __host__ __device__ Vector2f operator*(float f, const Vector2f &v) {
     return Vector2f(f * v.x(), f * v.y());
@@ -166,4 +175,6 @@ __host__ __device__ bool operator==(const Vector2f &v0, const Vector2f &v1) {
     return (v0.x() == v1.x() && v0.y() == v1.y());
 }
 
-__host__ __device__ bool operator!=(const Vector2f &v0, const Vector2f &v1) { return !(v0 == v1); }
+__host__ __device__ bool operator!=(const Vector2f &v0, const Vector2f &v1) {
+    return !(v0 == v1);
+}

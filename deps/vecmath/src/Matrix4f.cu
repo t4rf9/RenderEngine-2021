@@ -17,10 +17,10 @@ __host__ __device__ Matrix4f::Matrix4f(float fill) {
     }
 }
 
-__host__ __device__ Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
-                                       float m11, float m12, float m13, float m20, float m21,
-                                       float m22, float m23, float m30, float m31, float m32,
-                                       float m33) {
+__host__ __device__ Matrix4f::Matrix4f(float m00, float m01, float m02, float m03,
+                                       float m10, float m11, float m12, float m13,
+                                       float m20, float m21, float m22, float m23,
+                                       float m30, float m31, float m32, float m33) {
     m_elements[0] = m00;
     m_elements[1] = m10;
     m_elements[2] = m20;
@@ -49,8 +49,9 @@ __host__ __device__ Matrix4f &Matrix4f::operator/=(float d) {
     return *this;
 }
 
-__host__ __device__ Matrix4f::Matrix4f(const Vector4f &v0, const Vector4f &v1, const Vector4f &v2,
-                                       const Vector4f &v3, bool setColumns) {
+__host__ __device__ Matrix4f::Matrix4f(const Vector4f &v0, const Vector4f &v1,
+                                       const Vector4f &v2, const Vector4f &v3,
+                                       bool setColumns) {
     if (setColumns) {
         setCol(0, v0);
         setCol(1, v1);
@@ -79,10 +80,13 @@ __host__ __device__ const float &Matrix4f::operator()(int i, int j) const {
     return m_elements[j * 4 + i];
 }
 
-__host__ __device__ float &Matrix4f::operator()(int i, int j) { return m_elements[j * 4 + i]; }
+__host__ __device__ float &Matrix4f::operator()(int i, int j) {
+    return m_elements[j * 4 + i];
+}
 
 __host__ __device__ Vector4f Matrix4f::getRow(int i) const {
-    return Vector4f(m_elements[i], m_elements[i + 4], m_elements[i + 8], m_elements[i + 12]);
+    return Vector4f(m_elements[i], m_elements[i + 4], m_elements[i + 8],
+                    m_elements[i + 12]);
 }
 
 __host__ __device__ void Matrix4f::setRow(int i, const Vector4f &v) {
@@ -95,8 +99,8 @@ __host__ __device__ void Matrix4f::setRow(int i, const Vector4f &v) {
 __host__ __device__ Vector4f Matrix4f::getCol(int j) const {
     int colStart = 4 * j;
 
-    return Vector4f(m_elements[colStart], m_elements[colStart + 1], m_elements[colStart + 2],
-                    m_elements[colStart + 3]);
+    return Vector4f(m_elements[colStart], m_elements[colStart + 1],
+                    m_elements[colStart + 2], m_elements[colStart + 3]);
 }
 
 __host__ __device__ void Matrix4f::setCol(int j, const Vector4f &v) {
@@ -169,10 +173,14 @@ __host__ __device__ float Matrix4f::determinant() const {
     float m23 = m_elements[14];
     float m33 = m_elements[15];
 
-    float cofactor00 = Matrix3f::determinant3x3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
-    float cofactor01 = -Matrix3f::determinant3x3(m12, m13, m10, m22, m23, m20, m32, m33, m30);
-    float cofactor02 = Matrix3f::determinant3x3(m13, m10, m11, m23, m20, m21, m33, m30, m31);
-    float cofactor03 = -Matrix3f::determinant3x3(m10, m11, m12, m20, m21, m22, m30, m31, m32);
+    float cofactor00 =
+        Matrix3f::determinant3x3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
+    float cofactor01 =
+        -Matrix3f::determinant3x3(m12, m13, m10, m22, m23, m20, m32, m33, m30);
+    float cofactor02 =
+        Matrix3f::determinant3x3(m13, m10, m11, m23, m20, m21, m33, m30, m31);
+    float cofactor03 =
+        -Matrix3f::determinant3x3(m10, m11, m12, m20, m21, m22, m30, m31, m32);
 
     return (m00 * cofactor00 + m01 * cofactor01 + m02 * cofactor02 + m03 * cofactor03);
 }
@@ -198,27 +206,44 @@ __host__ __device__ Matrix4f Matrix4f::inverse(bool *pbIsSingular, float epsilon
     float m23 = m_elements[14];
     float m33 = m_elements[15];
 
-    float cofactor00 = Matrix3f::determinant3x3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
-    float cofactor01 = -Matrix3f::determinant3x3(m12, m13, m10, m22, m23, m20, m32, m33, m30);
-    float cofactor02 = Matrix3f::determinant3x3(m13, m10, m11, m23, m20, m21, m33, m30, m31);
-    float cofactor03 = -Matrix3f::determinant3x3(m10, m11, m12, m20, m21, m22, m30, m31, m32);
+    float cofactor00 =
+        Matrix3f::determinant3x3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
+    float cofactor01 =
+        -Matrix3f::determinant3x3(m12, m13, m10, m22, m23, m20, m32, m33, m30);
+    float cofactor02 =
+        Matrix3f::determinant3x3(m13, m10, m11, m23, m20, m21, m33, m30, m31);
+    float cofactor03 =
+        -Matrix3f::determinant3x3(m10, m11, m12, m20, m21, m22, m30, m31, m32);
 
-    float cofactor10 = -Matrix3f::determinant3x3(m21, m22, m23, m31, m32, m33, m01, m02, m03);
-    float cofactor11 = Matrix3f::determinant3x3(m22, m23, m20, m32, m33, m30, m02, m03, m00);
-    float cofactor12 = -Matrix3f::determinant3x3(m23, m20, m21, m33, m30, m31, m03, m00, m01);
-    float cofactor13 = Matrix3f::determinant3x3(m20, m21, m22, m30, m31, m32, m00, m01, m02);
+    float cofactor10 =
+        -Matrix3f::determinant3x3(m21, m22, m23, m31, m32, m33, m01, m02, m03);
+    float cofactor11 =
+        Matrix3f::determinant3x3(m22, m23, m20, m32, m33, m30, m02, m03, m00);
+    float cofactor12 =
+        -Matrix3f::determinant3x3(m23, m20, m21, m33, m30, m31, m03, m00, m01);
+    float cofactor13 =
+        Matrix3f::determinant3x3(m20, m21, m22, m30, m31, m32, m00, m01, m02);
 
-    float cofactor20 = Matrix3f::determinant3x3(m31, m32, m33, m01, m02, m03, m11, m12, m13);
-    float cofactor21 = -Matrix3f::determinant3x3(m32, m33, m30, m02, m03, m00, m12, m13, m10);
-    float cofactor22 = Matrix3f::determinant3x3(m33, m30, m31, m03, m00, m01, m13, m10, m11);
-    float cofactor23 = -Matrix3f::determinant3x3(m30, m31, m32, m00, m01, m02, m10, m11, m12);
+    float cofactor20 =
+        Matrix3f::determinant3x3(m31, m32, m33, m01, m02, m03, m11, m12, m13);
+    float cofactor21 =
+        -Matrix3f::determinant3x3(m32, m33, m30, m02, m03, m00, m12, m13, m10);
+    float cofactor22 =
+        Matrix3f::determinant3x3(m33, m30, m31, m03, m00, m01, m13, m10, m11);
+    float cofactor23 =
+        -Matrix3f::determinant3x3(m30, m31, m32, m00, m01, m02, m10, m11, m12);
 
-    float cofactor30 = -Matrix3f::determinant3x3(m01, m02, m03, m11, m12, m13, m21, m22, m23);
-    float cofactor31 = Matrix3f::determinant3x3(m02, m03, m00, m12, m13, m10, m22, m23, m20);
-    float cofactor32 = -Matrix3f::determinant3x3(m03, m00, m01, m13, m10, m11, m23, m20, m21);
-    float cofactor33 = Matrix3f::determinant3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+    float cofactor30 =
+        -Matrix3f::determinant3x3(m01, m02, m03, m11, m12, m13, m21, m22, m23);
+    float cofactor31 =
+        Matrix3f::determinant3x3(m02, m03, m00, m12, m13, m10, m22, m23, m20);
+    float cofactor32 =
+        -Matrix3f::determinant3x3(m03, m00, m01, m13, m10, m11, m23, m20, m21);
+    float cofactor33 =
+        Matrix3f::determinant3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
 
-    float determinant = m00 * cofactor00 + m01 * cofactor01 + m02 * cofactor02 + m03 * cofactor03;
+    float determinant =
+        m00 * cofactor00 + m01 * cofactor01 + m02 * cofactor02 + m03 * cofactor03;
 
     bool isSingular = (fabs(determinant) < epsilon);
     if (isSingular) {
@@ -233,14 +258,15 @@ __host__ __device__ Matrix4f Matrix4f::inverse(bool *pbIsSingular, float epsilon
 
         float reciprocalDeterminant = 1.0f / determinant;
 
-        return Matrix4f(cofactor00 * reciprocalDeterminant, cofactor10 * reciprocalDeterminant,
-                        cofactor20 * reciprocalDeterminant, cofactor30 * reciprocalDeterminant,
-                        cofactor01 * reciprocalDeterminant, cofactor11 * reciprocalDeterminant,
-                        cofactor21 * reciprocalDeterminant, cofactor31 * reciprocalDeterminant,
-                        cofactor02 * reciprocalDeterminant, cofactor12 * reciprocalDeterminant,
-                        cofactor22 * reciprocalDeterminant, cofactor32 * reciprocalDeterminant,
-                        cofactor03 * reciprocalDeterminant, cofactor13 * reciprocalDeterminant,
-                        cofactor23 * reciprocalDeterminant, cofactor33 * reciprocalDeterminant);
+        return Matrix4f(
+            cofactor00 * reciprocalDeterminant, cofactor10 * reciprocalDeterminant,
+            cofactor20 * reciprocalDeterminant, cofactor30 * reciprocalDeterminant,
+            cofactor01 * reciprocalDeterminant, cofactor11 * reciprocalDeterminant,
+            cofactor21 * reciprocalDeterminant, cofactor31 * reciprocalDeterminant,
+            cofactor02 * reciprocalDeterminant, cofactor12 * reciprocalDeterminant,
+            cofactor22 * reciprocalDeterminant, cofactor32 * reciprocalDeterminant,
+            cofactor03 * reciprocalDeterminant, cofactor13 * reciprocalDeterminant,
+            cofactor23 * reciprocalDeterminant, cofactor33 * reciprocalDeterminant);
     }
 }
 
@@ -309,8 +335,8 @@ __host__ __device__ Matrix4f Matrix4f::translation(float x, float y, float z) {
 
 // static
 __host__ __device__ Matrix4f Matrix4f::translation(const Vector3f &rTranslation) {
-    return Matrix4f(1, 0, 0, rTranslation.x(), 0, 1, 0, rTranslation.y(), 0, 0, 1, rTranslation.z(),
-                    0, 0, 0, 1);
+    return Matrix4f(1, 0, 0, rTranslation.x(), 0, 1, 0, rTranslation.y(), 0, 0, 1,
+                    rTranslation.z(), 0, 0, 0, 1);
 }
 
 // static
@@ -338,7 +364,8 @@ __host__ __device__ Matrix4f Matrix4f::rotateZ(float radians) {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::rotation(const Vector3f &rDirection, float radians) {
+__host__ __device__ Matrix4f Matrix4f::rotation(const Vector3f &rDirection,
+                                                float radians) {
     Vector3f normalizedDirection = rDirection.normalized();
 
     float cosTheta = cos(radians);
@@ -350,10 +377,12 @@ __host__ __device__ Matrix4f Matrix4f::rotation(const Vector3f &rDirection, floa
 
     return Matrix4f(
         x * x * (1.0f - cosTheta) + cosTheta, y * x * (1.0f - cosTheta) - z * sinTheta,
-        z * x * (1.0f - cosTheta) + y * sinTheta, 0.0f, x * y * (1.0f - cosTheta) + z * sinTheta,
-        y * y * (1.0f - cosTheta) + cosTheta, z * y * (1.0f - cosTheta) - x * sinTheta, 0.0f,
-        x * z * (1.0f - cosTheta) - y * sinTheta, y * z * (1.0f - cosTheta) + x * sinTheta,
-        z * z * (1.0f - cosTheta) + cosTheta, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+        z * x * (1.0f - cosTheta) + y * sinTheta, 0.0f,
+        x * y * (1.0f - cosTheta) + z * sinTheta, y * y * (1.0f - cosTheta) + cosTheta,
+        z * y * (1.0f - cosTheta) - x * sinTheta, 0.0f,
+        x * z * (1.0f - cosTheta) - y * sinTheta,
+        y * z * (1.0f - cosTheta) + x * sinTheta, z * z * (1.0f - cosTheta) + cosTheta,
+        0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 // static
@@ -375,8 +404,8 @@ __host__ __device__ Matrix4f Matrix4f::rotation(const Quat4f &q) {
 
     return Matrix4f(1.0f - 2.0f * (yy + zz), 2.0f * (xy - zw), 2.0f * (xz + yw), 0.0f,
                     2.0f * (xy + zw), 1.0f - 2.0f * (xx + zz), 2.0f * (yz - xw), 0.0f,
-                    2.0f * (xz - yw), 2.0f * (yz + xw), 1.0f - 2.0f * (xx + yy), 0.0f, 0.0f, 0.0f,
-                    0.0f, 1.0f);
+                    2.0f * (xz - yw), 2.0f * (yz + xw), 1.0f - 2.0f * (xx + yy), 0.0f,
+                    0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 // static
@@ -439,8 +468,9 @@ __host__ __device__ Matrix4f Matrix4f::orthographicProjection(float width, float
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::orthographicProjection(float left, float right, float bottom,
-                                                              float top, float zNear, float zFar,
+__host__ __device__ Matrix4f Matrix4f::orthographicProjection(float left, float right,
+                                                              float bottom, float top,
+                                                              float zNear, float zFar,
                                                               bool directX) {
     Matrix4f m;
 
@@ -487,9 +517,9 @@ __host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fLeft, float 
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fovYRadians, float aspect,
-                                                             float zNear, float zFar,
-                                                             bool directX) {
+__host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fovYRadians,
+                                                             float aspect, float zNear,
+                                                             float zFar, bool directX) {
     Matrix4f m; // zero matrix
 
     float yScale = 1.f / tanf(0.5f * fovYRadians);
@@ -511,9 +541,8 @@ __host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fovYRadians, 
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::infinitePerspectiveProjection(float fLeft, float fRight,
-                                                                     float fBottom, float fTop,
-                                                                     float fZNear, bool directX) {
+__host__ __device__ Matrix4f Matrix4f::infinitePerspectiveProjection(
+    float fLeft, float fRight, float fBottom, float fTop, float fZNear, bool directX) {
     Matrix4f projection;
 
     projection(0, 0) = (2.0f * fZNear) / (fRight - fLeft);

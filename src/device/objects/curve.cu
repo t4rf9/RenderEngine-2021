@@ -26,7 +26,7 @@ __device__ Curve::Curve(Vector3f *points, int num_controls) : num_controls(num_c
 }
 
 __device__ Curve::~Curve() {
-    delete[] controls;
+    //delete[] controls; // freed by SceneParser
     delete pBox;
 }
 

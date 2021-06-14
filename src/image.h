@@ -9,6 +9,8 @@
 
 #include "cuda_error.h"
 
+const bool debug = true;
+
 // Simple image class
 class Image {
 public:
@@ -16,6 +18,10 @@ public:
         width = w;
         height = h;
         checkCudaErrors(cudaMallocManaged(&data, width * height * sizeof(Vector3f)));
+        if (debug) {
+            printf("image->data:\t[0x%lx, 0x%lx)\n", data,
+                   data + width * height * sizeof(Vector3f));
+        }
     }
 
     ~Image() { checkCudaErrors(cudaFree(data)); }
@@ -23,6 +29,9 @@ public:
     static void *operator new(std::size_t sz) {
         void *res;
         checkCudaErrors(cudaMallocManaged(&res, sz));
+        if (debug) {
+            printf("image:\t0x%lx\n", res);
+        }
         return res;
     }
 

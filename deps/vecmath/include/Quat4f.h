@@ -22,10 +22,10 @@ public:
     // no destructor necessary
 
     // returns a quaternion with 0 real part
-    __host__ __device__ Quat4f(const Vector3f &v);
+    __host__ __device__ explicit Quat4f(const Vector3f &v);
 
     // copies the components of a Vector4f directly into this quaternion
-    __host__ __device__ Quat4f(const Vector4f &v);
+    __host__ __device__ explicit Quat4f(const Vector4f &v);
 
     // returns the ith element
     __host__ __device__ const float &operator[](int i) const;
@@ -79,7 +79,8 @@ public:
     __host__ __device__ static float dot(const Quat4f &q0, const Quat4f &q1);
 
     // linear (stupid) interpolation
-    __host__ __device__ static Quat4f lerp(const Quat4f &q0, const Quat4f &q1, float alpha);
+    __host__ __device__ static Quat4f lerp(const Quat4f &q0, const Quat4f &q1,
+                                           float alpha);
 
     // spherical linear interpolation
     __host__ __device__ static Quat4f slerp(const Quat4f &a, const Quat4f &b, float t,
@@ -88,11 +89,12 @@ public:
     // spherical quadratic interoplation between a and b at point t
     // given quaternion tangents tanA and tanB (can be computed using
     // squadTangent)
-    __host__ __device__ static Quat4f squad(const Quat4f &a, const Quat4f &tanA, const Quat4f &tanB,
-                                            const Quat4f &b, float t);
+    __host__ __device__ static Quat4f squad(const Quat4f &a, const Quat4f &tanA,
+                                            const Quat4f &tanB, const Quat4f &b, float t);
 
     __host__ __device__ static Quat4f cubicInterpolate(const Quat4f &q0, const Quat4f &q1,
-                                                       const Quat4f &q2, const Quat4f &q3, float t);
+                                                       const Quat4f &q2, const Quat4f &q3,
+                                                       float t);
 
     // Log-difference between a and b, used for squadTangent
     // returns log( a^-1 b )
@@ -100,13 +102,13 @@ public:
 
     // Computes a tangent at center, defined by the before and after quaternions
     // Useful for squad()
-    __host__ __device__ static Quat4f squadTangent(const Quat4f &before, const Quat4f &center,
-                                                   const Quat4f &after);
+    __host__ __device__ static Quat4f
+    squadTangent(const Quat4f &before, const Quat4f &center, const Quat4f &after);
 
     __host__ __device__ static Quat4f fromRotationMatrix(const Matrix3f &m);
 
-    __host__ __device__ static Quat4f fromRotatedBasis(const Vector3f &x, const Vector3f &y,
-                                                       const Vector3f &z);
+    __host__ __device__ static Quat4f
+    fromRotatedBasis(const Vector3f &x, const Vector3f &y, const Vector3f &z);
 
     // returns a unit quaternion that's a uniformly distributed rotation
     // given u[i] is a uniformly distributed random number in [0,1]

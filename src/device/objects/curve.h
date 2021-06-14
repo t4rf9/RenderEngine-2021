@@ -31,7 +31,7 @@ public:
     __device__ virtual ~Curve();
 
     __device__ inline bool intersect(const Ray &ray, Hit &hit, float t_min,
-                                     curandState *rand_state) override {
+                                     curandState &rand_state) override {
         return false;
     }
 

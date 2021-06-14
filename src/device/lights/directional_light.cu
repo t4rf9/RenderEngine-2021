@@ -1,7 +1,10 @@
 #include "directional_light.h"
 
-__device__ DirectionalLight::DirectionalLight(const Vector3f &d, const Vector3f &c)
-    : direction(d.normalized()), color(c) {}
+__device__ DirectionalLight::DirectionalLight(const Vector3f &direction,
+                                              const Vector3f &color)
+    : direction(direction.normalized()), color(color) {}
+
+__device__ DirectionalLight::~DirectionalLight() {}
 
 __device__ void DirectionalLight::getIllumination(const Vector3f &p, Vector3f &dir,
                                                   Vector3f &col) const {

@@ -13,15 +13,15 @@ class Vector3f;
 class Matrix3f {
 public:
     // Fill a 3x3 matrix with "fill", default to 0.
-    __host__ __device__ Matrix3f(float fill = 0.f);
+    __host__ __device__ explicit Matrix3f(float fill = 0.f);
 
-    __host__ __device__ Matrix3f(float m00, float m01, float m02, float m10, float m11, float m12,
-                                 float m20, float m21, float m22);
+    __host__ __device__ Matrix3f(float m00, float m01, float m02, float m10, float m11,
+                                 float m12, float m20, float m21, float m22);
 
     // setColumns = true ==> sets the columns of the matrix to be [v0 v1 v2]
     // otherwise, sets the rows
-    __host__ __device__ Matrix3f(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2,
-                                 bool setColumns = true);
+    __host__ __device__ Matrix3f(const Vector3f &v0, const Vector3f &v1,
+                                 const Vector3f &v2, bool setColumns = true);
 
     __host__ __device__ Matrix3f(const Matrix3f &rm);            // copy constructor
     __host__ __device__ Matrix3f &operator=(const Matrix3f &rm); // assignment operator
@@ -61,9 +61,9 @@ public:
     operator float *(); // automatic type conversion for GL
     void print();
 
-    __host__ __device__ static float determinant3x3(float m00, float m01, float m02, float m10,
-                                                    float m11, float m12, float m20, float m21,
-                                                    float m22);
+    __host__ __device__ static float determinant3x3(float m00, float m01, float m02,
+                                                    float m10, float m11, float m12,
+                                                    float m20, float m21, float m22);
 
     __host__ __device__ static Matrix3f ones();
 
@@ -79,7 +79,8 @@ public:
 
     __host__ __device__ static Matrix3f uniformScaling(float s);
 
-    __host__ __device__ static Matrix3f rotation(const Vector3f &rDirection, float radians);
+    __host__ __device__ static Matrix3f rotation(const Vector3f &rDirection,
+                                                 float radians);
 
     // Returns the rotation matrix represented by a unit quaternion
     // if q is not normalized, it it normalized first

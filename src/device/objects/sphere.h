@@ -12,10 +12,10 @@ public:
 
     __device__ Sphere(const Vector3f &center, float radius, Material *material);
 
-    __device__ ~Sphere() override = default;
+    __device__ ~Sphere() override;
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
-                              curandState *rand_state) override;
+                              curandState &rand_state) override;
 
 protected:
     Vector3f center;

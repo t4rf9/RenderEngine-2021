@@ -3,9 +3,13 @@
 __device__ Sphere::Sphere() : center(0.f), radius(1.f), radius_squared(1.f) {}
 
 __device__ Sphere::Sphere(const Vector3f &center, float radius, Material *material)
-    : Object3D(material), center(center), radius(radius), radius_squared(radius * radius) {}
+    : Object3D(material), center(center), radius(radius),
+      radius_squared(radius * radius) {}
 
-__device__ bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min, curandState *rand_state) {
+__device__ Sphere::~Sphere() {}
+
+__device__ bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min,
+                                  curandState &rand_state) {
     // origin lies anywhere
     Vector3f l = center - ray.getOrigin();
     bool inside = l.length() < radius;

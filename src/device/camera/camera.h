@@ -11,12 +11,13 @@
 
 class Camera {
 public:
-    __device__ Camera(const Vector3f &pos, const Vector3f &direction, const Vector3f &up, int imgW, int imgH);
+    __device__ Camera(const Vector3f &pos, const Vector3f &direction, const Vector3f &up,
+                      int imgW, int imgH);
 
-    __device__ virtual ~Camera() = default;
+    __device__ virtual ~Camera();
 
     // Generate rays for each screen-space coordinate
-    __device__ virtual Ray *generateRay(const Vector2f &point) = 0;
+    __device__ virtual Ray generateRay(const Vector2f &point) = 0;
 
     __host__ __device__ inline int getWidth() const { return width; }
 

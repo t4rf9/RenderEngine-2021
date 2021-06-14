@@ -9,7 +9,9 @@ cmake --build build -j 16
 # Run all testcases. 
 # You can comment some lines to disable the run of specific examples.
 mkdir -p output
-time bin/main testcases/scene_test.txt output/test.bmp > output/test.txt
+
+time bin/main testcases/scene_final.txt output/final.bmp > output/final.txt
+#time bin/main testcases/scene_test.txt output/test.bmp > output/test.txt
 #time bin/main testcases/scene01_basic.txt output/scene01.bmp > output/scene01.txt
 #time bin/main testcases/scene02_cube.txt output/scene02.bmp
 #time bin/main testcases/scene03_sphere.txt output/scene03.bmp

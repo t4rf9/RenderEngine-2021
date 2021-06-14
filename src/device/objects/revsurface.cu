@@ -41,11 +41,15 @@ __device__ RevSurface::~RevSurface() {
     delete pBound;
 }
 
-__device__ const int repeat_limit = 1000;
-__device__ const int iterate_limit = 500;
+__device__ const int repeat_limit = 10000;
+__device__ const int iterate_limit = 800;
+
+//__device__ const float A[20] = {0.025f, 0.075f, 0.125f, 0.175f, 0.225f, 0.275f, 0.325f,
+// 0.375f, 0.425f, 0.475f, 0.525f, 0.575f, 0.625f, 0.675f, 0.725f, 0.775f, 0.825,
+// 0.875f, 0.925f, 0.975f};
 
 __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
-                                      curandState *rand_state) {
+                                      curandState &rand_state) {
     // PA3 optional: implement this for the ray-tracing routine using G-N
     // iteration.
     Vector3f d = ray.getDirection();
@@ -59,8 +63,11 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        Vector3f x(t_min + curand_uniform(rand_state), curand_uniform(rand_state),
-                   20.f * curand_uniform(rand_state) - 10.f);
+        // for (int j = 0; j < 20; j++) {
+        // for (int k = 0; k < 20; k++) {
+        Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
+                   20.f * curand_uniform(&rand_state) - 10.f);
+        // Vector3f x(t_min + A[i], A[j], 20.f * A[k] - 10.f);
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
@@ -75,7 +82,7 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
             Vector3f F = o + t * d - Vector3f(cosv * f.V.x(), f.V.y(), sinv * f.V.x());
 
             Vector3f T_y = Vector3f(cosv * f.T.x(), f.T.y(), sinv * f.T.x());
-            if (F.length() < 1e-6f) {
+            if (F.length() < 1e-5f) {
                 if (t <= t_min || t >= hit.getT()) {
                     break;
                 }
@@ -85,13 +92,15 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
                 break;
             }
 
-            Matrix3f F_prime = Matrix3f(
-                d, -T_y,
-                Vector3f((2.f * sinv / divisor) * f.V[0], 0.f, -((2.f * cosv) / divisor) * f.V[0]));
+            Matrix3f F_prime = Matrix3f(d, -T_y,
+                                        Vector3f((2.f * sinv / divisor) * f.V[0], 0.f,
+                                                 -((2.f * cosv) / divisor) * f.V[0]));
             Vector3f dx = F_prime.inverse() * F;
 
             x -= dx;
         }
+        //}
+        //}
     }
     return res;
 }
@@ -145,16 +154,19 @@ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min) {
                     // std::cout << "\t\t" << hit << std::endl;
                     // Vector3f rp = ray.pointAtParameter(t);
                     // Vector3f cp = Vector3f(f.V.x() * cosv, f.V.y(), f.V.x() * sinv);
-                    // std::cout << "\t\tray:\t" << rp[0] << ", " << rp[1] << ", " << rp[2]
+                    // std::cout << "\t\tray:\t" << rp[0] << ", " << rp[1] << ", " <<
+rp[2]
                     //          << std::endl;
-                    // std::cout << "\t\tcurve:\t" << cp[0] << ", " << cp[1] << ", " << cp[2]
+                    // std::cout << "\t\tcurve:\t" << cp[0] << ", " << cp[1] << ", " <<
+cp[2]
                     //          << std::endl;
 
                     res = true;
                     break;
                 }
 
-                float F_prime = 2 * (f.T.y() * (_b1 * d.x() + _b2 * d.z()) - _b3 * d.y() * f.T.x());
+                float F_prime = 2 * (f.T.y() * (_b1 * d.x() + _b2 * d.z()) - _b3 * d.y() *
+f.T.x());
 
                 u -= F / F_prime;
             }
@@ -203,9 +215,11 @@ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min) {
                     // std::cout << "\t" << hit << std::endl;
                     // Vector3f rp = ray.pointAtParameter(t);
                     // Vector3f cp = Vector3f(f.V.x() * cosv, f.V.y(), f.V.x() * sinv);
-                    // std::cout << "\t\tray:\t" << rp[0] << ", " << rp[1] << ", " << rp[2]
+                    // std::cout << "\t\tray:\t" << rp[0] << ", " << rp[1] << ", " <<
+rp[2]
                     //          << std::endl;
-                    // std::cout << "\t\tcurve:\t" << cp[0] << ", " << cp[1] << ", " << cp[2]
+                    // std::cout << "\t\tcurve:\t" << cp[0] << ", " << cp[1] << ", " <<
+cp[2]
                     //          << std::endl;
 
                     res = true;

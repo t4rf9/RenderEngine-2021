@@ -17,16 +17,18 @@ class Vector4f;
 class Matrix4f {
 public:
     // Fill a 4x4 matrix with "fill".  Default to 0.
-    __host__ __device__ Matrix4f(float fill = 0.f);
+    __host__ __device__ explicit Matrix4f(float fill = 0.f);
 
-    __host__ __device__ Matrix4f(float m00, float m01, float m02, float m03, float m10, float m11,
-                                 float m12, float m13, float m20, float m21, float m22, float m23,
-                                 float m30, float m31, float m32, float m33);
+    __host__ __device__ Matrix4f(float m00, float m01, float m02, float m03, float m10,
+                                 float m11, float m12, float m13, float m20, float m21,
+                                 float m22, float m23, float m30, float m31, float m32,
+                                 float m33);
 
     // setColumns = true ==> sets the columns of the matrix to be [v0 v1 v2 v3]
     // otherwise, sets the rows
-    __host__ __device__ Matrix4f(const Vector4f &v0, const Vector4f &v1, const Vector4f &v2,
-                                 const Vector4f &v3, bool setColumns = true);
+    __host__ __device__ Matrix4f(const Vector4f &v0, const Vector4f &v1,
+                                 const Vector4f &v2, const Vector4f &v3,
+                                 bool setColumns = true);
 
     __host__ __device__ Matrix4f(const Matrix4f &rm);            // copy constructor
     __host__ __device__ Matrix4f &operator=(const Matrix4f &rm); // assignment operator
@@ -64,7 +66,8 @@ public:
 
     __host__ __device__ float determinant() const;
 
-    __host__ __device__ Matrix4f inverse(bool *pbIsSingular = NULL, float epsilon = 0.f) const;
+    __host__ __device__ Matrix4f inverse(bool *pbIsSingular = NULL,
+                                         float epsilon = 0.f) const;
 
     __host__ __device__ void transpose();
 
@@ -90,33 +93,37 @@ public:
 
     __host__ __device__ static Matrix4f rotateZ(float radians);
 
-    __host__ __device__ static Matrix4f rotation(const Vector3f &rDirection, float radians);
+    __host__ __device__ static Matrix4f rotation(const Vector3f &rDirection,
+                                                 float radians);
 
     __host__ __device__ static Matrix4f scaling(float sx, float sy, float sz);
 
     __host__ __device__ static Matrix4f uniformScaling(float s);
 
-    __host__ __device__ static Matrix4f lookAt(const Vector3f &eye, const Vector3f &center,
-                                               const Vector3f &up);
-
     __host__ __device__ static Matrix4f
-    orthographicProjection(float width, float height, float zNear, float zFar, bool directX);
+    lookAt(const Vector3f &eye, const Vector3f &center, const Vector3f &up);
+
+    __host__ __device__ static Matrix4f orthographicProjection(float width, float height,
+                                                               float zNear, float zFar,
+                                                               bool directX);
 
     __host__ __device__ static Matrix4f orthographicProjection(float left, float right,
-                                                               float bottom, float top, float zNear,
-                                                               float zFar, bool directX);
+                                                               float bottom, float top,
+                                                               float zNear, float zFar,
+                                                               bool directX);
 
     __host__ __device__ static Matrix4f perspectiveProjection(float fLeft, float fRight,
                                                               float fBottom, float fTop,
                                                               float fZNear, float fZFar,
                                                               bool directX);
 
-    __host__ __device__ static Matrix4f
-    perspectiveProjection(float fovYRadians, float aspect, float zNear, float zFar, bool directX);
+    __host__ __device__ static Matrix4f perspectiveProjection(float fovYRadians,
+                                                              float aspect, float zNear,
+                                                              float zFar, bool directX);
 
-    __host__ __device__ static Matrix4f infinitePerspectiveProjection(float fLeft, float fRight,
-                                                                      float fBottom, float fTop,
-                                                                      float fZNear, bool directX);
+    __host__ __device__ static Matrix4f
+    infinitePerspectiveProjection(float fLeft, float fRight, float fBottom, float fTop,
+                                  float fZNear, bool directX);
 
     // Returns the rotation matrix represented by a quaternion
     // uses a normalized version of q
