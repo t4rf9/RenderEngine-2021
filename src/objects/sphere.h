@@ -14,7 +14,7 @@ public:
 
     ~Sphere() override = default;
 
-    bool intersect(const Ray &ray, Hit &hit, float t_min) override;
+    bool intersect(const Ray &ray, Hit &hit, float t_min, uint_fast32_t &rand) override;
 
 protected:
     Vector3f center;

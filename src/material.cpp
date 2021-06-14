@@ -6,22 +6,6 @@ Material::Material(const Vector3f &d_color, const Vector3f &s_color, float shini
       reflect_coefficient(reflect_coefficient), refract_coefficient(refract_coefficient),
       refractive_index(refractive_index) {}
 
-void *Material::operator new(std::size_t sz) {
-    void *res;
-    checkCudaErrors(cudaMallocManaged(&res, sz));
-    return res;
-}
-
-void *Material::operator new[](std::size_t sz) {
-    void *res;
-    checkCudaErrors(cudaMallocManaged(&res, sz));
-    return res;
-}
-
-void Material::operator delete(void *ptr) { checkCudaErrors(cudaFree(ptr)); }
-
-void Material::operator delete[](void *ptr) { checkCudaErrors(cudaFree(ptr)); }
-
 Vector3f Material::getSpecularColor() const { return specularColor; }
 
 Vector3f Material::getDiffuseColor() const { return diffuseColor; }

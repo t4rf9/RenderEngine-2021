@@ -11,13 +11,13 @@
 #include "Vector3f.h"
 #include "Vector4f.h"
 
-__host__ __device__ Matrix4f::Matrix4f(float fill) {
+Matrix4f::Matrix4f(float fill) {
     for (int i = 0; i < 16; ++i) {
         m_elements[i] = fill;
     }
 }
 
-__host__ __device__ Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
+Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
                                        float m11, float m12, float m13, float m20, float m21,
                                        float m22, float m23, float m30, float m31, float m32,
                                        float m33) {
@@ -42,14 +42,14 @@ __host__ __device__ Matrix4f::Matrix4f(float m00, float m01, float m02, float m0
     m_elements[15] = m33;
 }
 
-__host__ __device__ Matrix4f &Matrix4f::operator/=(float d) {
+Matrix4f &Matrix4f::operator/=(float d) {
     for (int ii = 0; ii < 16; ii++) {
         m_elements[ii] /= d;
     }
     return *this;
 }
 
-__host__ __device__ Matrix4f::Matrix4f(const Vector4f &v0, const Vector4f &v1, const Vector4f &v2,
+Matrix4f::Matrix4f(const Vector4f &v0, const Vector4f &v1, const Vector4f &v2,
                                        const Vector4f &v3, bool setColumns) {
     if (setColumns) {
         setCol(0, v0);
@@ -64,42 +64,42 @@ __host__ __device__ Matrix4f::Matrix4f(const Vector4f &v0, const Vector4f &v1, c
     }
 }
 
-__host__ __device__ Matrix4f::Matrix4f(const Matrix4f &rm) {
+Matrix4f::Matrix4f(const Matrix4f &rm) {
     memcpy(m_elements, rm.m_elements, 16 * sizeof(float));
 }
 
-__host__ __device__ Matrix4f &Matrix4f::operator=(const Matrix4f &rm) {
+Matrix4f &Matrix4f::operator=(const Matrix4f &rm) {
     if (this != &rm) {
         memcpy(m_elements, rm.m_elements, 16 * sizeof(float));
     }
     return *this;
 }
 
-__host__ __device__ const float &Matrix4f::operator()(int i, int j) const {
+const float &Matrix4f::operator()(int i, int j) const {
     return m_elements[j * 4 + i];
 }
 
-__host__ __device__ float &Matrix4f::operator()(int i, int j) { return m_elements[j * 4 + i]; }
+float &Matrix4f::operator()(int i, int j) { return m_elements[j * 4 + i]; }
 
-__host__ __device__ Vector4f Matrix4f::getRow(int i) const {
+Vector4f Matrix4f::getRow(int i) const {
     return Vector4f(m_elements[i], m_elements[i + 4], m_elements[i + 8], m_elements[i + 12]);
 }
 
-__host__ __device__ void Matrix4f::setRow(int i, const Vector4f &v) {
+void Matrix4f::setRow(int i, const Vector4f &v) {
     m_elements[i] = v.x();
     m_elements[i + 4] = v.y();
     m_elements[i + 8] = v.z();
     m_elements[i + 12] = v.w();
 }
 
-__host__ __device__ Vector4f Matrix4f::getCol(int j) const {
+Vector4f Matrix4f::getCol(int j) const {
     int colStart = 4 * j;
 
     return Vector4f(m_elements[colStart], m_elements[colStart + 1], m_elements[colStart + 2],
                     m_elements[colStart + 3]);
 }
 
-__host__ __device__ void Matrix4f::setCol(int j, const Vector4f &v) {
+void Matrix4f::setCol(int j, const Vector4f &v) {
     int colStart = 4 * j;
 
     m_elements[colStart] = v.x();
@@ -108,7 +108,7 @@ __host__ __device__ void Matrix4f::setCol(int j, const Vector4f &v) {
     m_elements[colStart + 3] = v.w();
 }
 
-__host__ __device__ Matrix2f Matrix4f::getSubmatrix2x2(int i0, int j0) const {
+Matrix2f Matrix4f::getSubmatrix2x2(int i0, int j0) const {
     Matrix2f out;
 
     for (int i = 0; i < 2; ++i) {
@@ -120,7 +120,7 @@ __host__ __device__ Matrix2f Matrix4f::getSubmatrix2x2(int i0, int j0) const {
     return out;
 }
 
-__host__ __device__ Matrix3f Matrix4f::getSubmatrix3x3(int i0, int j0) const {
+Matrix3f Matrix4f::getSubmatrix3x3(int i0, int j0) const {
     Matrix3f out;
 
     for (int i = 0; i < 3; ++i) {
@@ -132,7 +132,7 @@ __host__ __device__ Matrix3f Matrix4f::getSubmatrix3x3(int i0, int j0) const {
     return out;
 }
 
-__host__ __device__ void Matrix4f::setSubmatrix2x2(int i0, int j0, const Matrix2f &m) {
+void Matrix4f::setSubmatrix2x2(int i0, int j0, const Matrix2f &m) {
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 2; ++j) {
             (*this)(i + i0, j + j0) = m(i, j);
@@ -140,7 +140,7 @@ __host__ __device__ void Matrix4f::setSubmatrix2x2(int i0, int j0, const Matrix2
     }
 }
 
-__host__ __device__ void Matrix4f::setSubmatrix3x3(int i0, int j0, const Matrix3f &m) {
+void Matrix4f::setSubmatrix3x3(int i0, int j0, const Matrix3f &m) {
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             (*this)(i + i0, j + j0) = m(i, j);
@@ -148,7 +148,7 @@ __host__ __device__ void Matrix4f::setSubmatrix3x3(int i0, int j0, const Matrix3
     }
 }
 
-__host__ __device__ float Matrix4f::determinant() const {
+float Matrix4f::determinant() const {
     float m00 = m_elements[0];
     float m10 = m_elements[1];
     float m20 = m_elements[2];
@@ -177,7 +177,7 @@ __host__ __device__ float Matrix4f::determinant() const {
     return (m00 * cofactor00 + m01 * cofactor01 + m02 * cofactor02 + m03 * cofactor03);
 }
 
-__host__ __device__ Matrix4f Matrix4f::inverse(bool *pbIsSingular, float epsilon) const {
+Matrix4f Matrix4f::inverse(bool *pbIsSingular, float epsilon) const {
     float m00 = m_elements[0];
     float m10 = m_elements[1];
     float m20 = m_elements[2];
@@ -244,7 +244,7 @@ __host__ __device__ Matrix4f Matrix4f::inverse(bool *pbIsSingular, float epsilon
     }
 }
 
-__host__ __device__ void Matrix4f::transpose() {
+void Matrix4f::transpose() {
     float temp;
 
     for (int i = 0; i < 3; ++i) {
@@ -256,7 +256,7 @@ __host__ __device__ void Matrix4f::transpose() {
     }
 }
 
-__host__ __device__ Matrix4f Matrix4f::transposed() const {
+Matrix4f Matrix4f::transposed() const {
     Matrix4f out;
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
@@ -281,7 +281,7 @@ void Matrix4f::print() {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::ones() {
+Matrix4f Matrix4f::ones() {
     Matrix4f m;
     for (int i = 0; i < 16; ++i) {
         m.m_elements[i] = 1;
@@ -291,7 +291,7 @@ __host__ __device__ Matrix4f Matrix4f::ones() {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::identity() {
+Matrix4f Matrix4f::identity() {
     Matrix4f m;
 
     m(0, 0) = 1;
@@ -303,18 +303,18 @@ __host__ __device__ Matrix4f Matrix4f::identity() {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::translation(float x, float y, float z) {
+Matrix4f Matrix4f::translation(float x, float y, float z) {
     return Matrix4f(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::translation(const Vector3f &rTranslation) {
+Matrix4f Matrix4f::translation(const Vector3f &rTranslation) {
     return Matrix4f(1, 0, 0, rTranslation.x(), 0, 1, 0, rTranslation.y(), 0, 0, 1, rTranslation.z(),
                     0, 0, 0, 1);
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::rotateX(float radians) {
+Matrix4f Matrix4f::rotateX(float radians) {
     float c = cos(radians);
     float s = sin(radians);
 
@@ -322,7 +322,7 @@ __host__ __device__ Matrix4f Matrix4f::rotateX(float radians) {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::rotateY(float radians) {
+Matrix4f Matrix4f::rotateY(float radians) {
     float c = cos(radians);
     float s = sin(radians);
 
@@ -330,7 +330,7 @@ __host__ __device__ Matrix4f Matrix4f::rotateY(float radians) {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::rotateZ(float radians) {
+Matrix4f Matrix4f::rotateZ(float radians) {
     float c = cos(radians);
     float s = sin(radians);
 
@@ -338,7 +338,7 @@ __host__ __device__ Matrix4f Matrix4f::rotateZ(float radians) {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::rotation(const Vector3f &rDirection, float radians) {
+Matrix4f Matrix4f::rotation(const Vector3f &rDirection, float radians) {
     Vector3f normalizedDirection = rDirection.normalized();
 
     float cosTheta = cos(radians);
@@ -357,7 +357,7 @@ __host__ __device__ Matrix4f Matrix4f::rotation(const Vector3f &rDirection, floa
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::rotation(const Quat4f &q) {
+Matrix4f Matrix4f::rotation(const Quat4f &q) {
     Quat4f qq = q.normalized();
 
     float xx = qq.x() * qq.x();
@@ -380,22 +380,22 @@ __host__ __device__ Matrix4f Matrix4f::rotation(const Quat4f &q) {
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::scaling(float sx, float sy, float sz) {
+Matrix4f Matrix4f::scaling(float sx, float sy, float sz) {
     return Matrix4f(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::uniformScaling(float s) {
+Matrix4f Matrix4f::uniformScaling(float s) {
     return Matrix4f(s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, 0, 0, 0, 1);
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::randomRotation(float u0, float u1, float u2) {
+Matrix4f Matrix4f::randomRotation(float u0, float u1, float u2) {
     return Matrix4f::rotation(Quat4f::randomRotation(u0, u1, u2));
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::lookAt(const Vector3f &eye, const Vector3f &center,
+Matrix4f Matrix4f::lookAt(const Vector3f &eye, const Vector3f &center,
                                               const Vector3f &up) {
     // z is negative forward
     Vector3f z = (eye - center).normalized();
@@ -415,7 +415,7 @@ __host__ __device__ Matrix4f Matrix4f::lookAt(const Vector3f &eye, const Vector3
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::orthographicProjection(float width, float height,
+Matrix4f Matrix4f::orthographicProjection(float width, float height,
                                                               float zNear, float zFar,
                                                               bool directX) {
     Matrix4f m;
@@ -439,7 +439,7 @@ __host__ __device__ Matrix4f Matrix4f::orthographicProjection(float width, float
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::orthographicProjection(float left, float right, float bottom,
+Matrix4f Matrix4f::orthographicProjection(float left, float right, float bottom,
                                                               float top, float zNear, float zFar,
                                                               bool directX) {
     Matrix4f m;
@@ -463,7 +463,7 @@ __host__ __device__ Matrix4f Matrix4f::orthographicProjection(float left, float 
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fLeft, float fRight,
+Matrix4f Matrix4f::perspectiveProjection(float fLeft, float fRight,
                                                              float fBottom, float fTop,
                                                              float fZNear, float fZFar,
                                                              bool directX) {
@@ -487,7 +487,7 @@ __host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fLeft, float 
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fovYRadians, float aspect,
+Matrix4f Matrix4f::perspectiveProjection(float fovYRadians, float aspect,
                                                              float zNear, float zFar,
                                                              bool directX) {
     Matrix4f m; // zero matrix
@@ -511,7 +511,7 @@ __host__ __device__ Matrix4f Matrix4f::perspectiveProjection(float fovYRadians, 
 }
 
 // static
-__host__ __device__ Matrix4f Matrix4f::infinitePerspectiveProjection(float fLeft, float fRight,
+Matrix4f Matrix4f::infinitePerspectiveProjection(float fLeft, float fRight,
                                                                      float fBottom, float fTop,
                                                                      float fZNear, bool directX) {
     Matrix4f projection;
@@ -539,7 +539,7 @@ __host__ __device__ Matrix4f Matrix4f::infinitePerspectiveProjection(float fLeft
 // Operators
 //////////////////////////////////////////////////////////////////////////
 
-__host__ __device__ Vector4f operator*(const Matrix4f &m, const Vector4f &v) {
+Vector4f operator*(const Matrix4f &m, const Vector4f &v) {
     Vector4f output(0, 0, 0, 0);
 
     for (int i = 0; i < 4; ++i) {
@@ -551,7 +551,7 @@ __host__ __device__ Vector4f operator*(const Matrix4f &m, const Vector4f &v) {
     return output;
 }
 
-__host__ __device__ Matrix4f operator*(const Matrix4f &x, const Matrix4f &y) {
+Matrix4f operator*(const Matrix4f &x, const Matrix4f &y) {
     Matrix4f product; // zeroes
 
     for (int i = 0; i < 4; ++i) {

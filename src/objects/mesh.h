@@ -34,7 +34,7 @@ public:
     std::vector<Vector3f> v;
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    bool intersect(const Ray &r, Hit &h, float tmin, uint_fast32_t &rand) override;
 
 private:
     // Normal can be used for light estimation

@@ -9,13 +9,13 @@
 #include "Quat4f.h"
 #include "Vector3f.h"
 
-__host__ __device__ Matrix3f::Matrix3f(float fill) {
+Matrix3f::Matrix3f(float fill) {
   for (int i = 0; i < 9; ++i) {
     m_elements[i] = fill;
   }
 }
 
-__host__ __device__ Matrix3f::Matrix3f(float m00, float m01, float m02, float m10, float m11,
+Matrix3f::Matrix3f(float m00, float m01, float m02, float m10, float m11,
                    float m12, float m20, float m21, float m22) {
   m_elements[0] = m00;
   m_elements[1] = m10;
@@ -30,7 +30,7 @@ __host__ __device__ Matrix3f::Matrix3f(float m00, float m01, float m02, float m1
   m_elements[8] = m22;
 }
 
-__host__ __device__ Matrix3f::Matrix3f(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2,
+Matrix3f::Matrix3f(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2,
                    bool setColumns) {
   if (setColumns) {
     setCol(0, v0);
@@ -43,41 +43,41 @@ __host__ __device__ Matrix3f::Matrix3f(const Vector3f &v0, const Vector3f &v1, c
   }
 }
 
-__host__ __device__ Matrix3f::Matrix3f(const Matrix3f &rm) {
+Matrix3f::Matrix3f(const Matrix3f &rm) {
   memcpy(m_elements, rm.m_elements, 9 * sizeof(float));
 }
 
-__host__ __device__ Matrix3f &Matrix3f::operator=(const Matrix3f &rm) {
+Matrix3f &Matrix3f::operator=(const Matrix3f &rm) {
   if (this != &rm) {
     memcpy(m_elements, rm.m_elements, 9 * sizeof(float));
   }
   return *this;
 }
 
-__host__ __device__ const float &Matrix3f::operator()(int i, int j) const {
+const float &Matrix3f::operator()(int i, int j) const {
   return m_elements[j * 3 + i];
 }
 
-__host__ __device__ float &Matrix3f::operator()(int i, int j) { return m_elements[j * 3 + i]; }
+float &Matrix3f::operator()(int i, int j) { return m_elements[j * 3 + i]; }
 
-__host__ __device__ Vector3f Matrix3f::getRow(int i) const {
+Vector3f Matrix3f::getRow(int i) const {
   return Vector3f(m_elements[i], m_elements[i + 3], m_elements[i + 6]);
 }
 
-__host__ __device__ void Matrix3f::setRow(int i, const Vector3f &v) {
+void Matrix3f::setRow(int i, const Vector3f &v) {
   m_elements[i] = v.x();
   m_elements[i + 3] = v.y();
   m_elements[i + 6] = v.z();
 }
 
-__host__ __device__ Vector3f Matrix3f::getCol(int j) const {
+Vector3f Matrix3f::getCol(int j) const {
   int colStart = 3 * j;
 
   return Vector3f(m_elements[colStart], m_elements[colStart + 1],
                   m_elements[colStart + 2]);
 }
 
-__host__ __device__ void Matrix3f::setCol(int j, const Vector3f &v) {
+void Matrix3f::setCol(int j, const Vector3f &v) {
   int colStart = 3 * j;
 
   m_elements[colStart] = v.x();
@@ -85,7 +85,7 @@ __host__ __device__ void Matrix3f::setCol(int j, const Vector3f &v) {
   m_elements[colStart + 2] = v.z();
 }
 
-__host__ __device__ Matrix2f Matrix3f::getSubmatrix2x2(int i0, int j0) const {
+Matrix2f Matrix3f::getSubmatrix2x2(int i0, int j0) const {
   Matrix2f out;
 
   for (int i = 0; i < 2; ++i) {
@@ -97,7 +97,7 @@ __host__ __device__ Matrix2f Matrix3f::getSubmatrix2x2(int i0, int j0) const {
   return out;
 }
 
-__host__ __device__ void Matrix3f::setSubmatrix2x2(int i0, int j0, const Matrix2f &m) {
+void Matrix3f::setSubmatrix2x2(int i0, int j0, const Matrix2f &m) {
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 2; ++j) {
       (*this)(i + i0, j + j0) = m(i, j);
@@ -105,13 +105,13 @@ __host__ __device__ void Matrix3f::setSubmatrix2x2(int i0, int j0, const Matrix2
   }
 }
 
-__host__ __device__ float Matrix3f::determinant() const {
+float Matrix3f::determinant() const {
   return Matrix3f::determinant3x3(m_elements[0], m_elements[3], m_elements[6],
                                   m_elements[1], m_elements[4], m_elements[7],
                                   m_elements[2], m_elements[5], m_elements[8]);
 }
 
-__host__ __device__ Matrix3f Matrix3f::inverse(bool *pbIsSingular, float epsilon) const {
+Matrix3f Matrix3f::inverse(bool *pbIsSingular, float epsilon) const {
   float m00 = m_elements[0];
   float m10 = m_elements[1];
   float m20 = m_elements[2];
@@ -160,7 +160,7 @@ __host__ __device__ Matrix3f Matrix3f::inverse(bool *pbIsSingular, float epsilon
   }
 }
 
-__host__ __device__ void Matrix3f::transpose() {
+void Matrix3f::transpose() {
   float temp;
 
   for (int i = 0; i < 2; ++i) {
@@ -172,7 +172,7 @@ __host__ __device__ void Matrix3f::transpose() {
   }
 }
 
-__host__ __device__ Matrix3f Matrix3f::transposed() const {
+Matrix3f Matrix3f::transposed() const {
   Matrix3f out;
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
@@ -193,7 +193,7 @@ void Matrix3f::print() {
 }
 
 // static
-__host__ __device__ float Matrix3f::determinant3x3(float m00, float m01, float m02, float m10,
+float Matrix3f::determinant3x3(float m00, float m01, float m02, float m10,
                                float m11, float m12, float m20, float m21,
                                float m22) {
   return (m00 * (m11 * m22 - m12 * m21) - m01 * (m10 * m22 - m12 * m20) +
@@ -201,7 +201,7 @@ __host__ __device__ float Matrix3f::determinant3x3(float m00, float m01, float m
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::ones() {
+Matrix3f Matrix3f::ones() {
   Matrix3f m;
   for (int i = 0; i < 9; ++i) {
     m.m_elements[i] = 1;
@@ -211,7 +211,7 @@ __host__ __device__ Matrix3f Matrix3f::ones() {
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::identity() {
+Matrix3f Matrix3f::identity() {
   Matrix3f m;
 
   m(0, 0) = 1;
@@ -222,7 +222,7 @@ __host__ __device__ Matrix3f Matrix3f::identity() {
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::rotateX(float radians) {
+Matrix3f Matrix3f::rotateX(float radians) {
   float c = cos(radians);
   float s = sin(radians);
 
@@ -230,7 +230,7 @@ __host__ __device__ Matrix3f Matrix3f::rotateX(float radians) {
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::rotateY(float radians) {
+Matrix3f Matrix3f::rotateY(float radians) {
   float c = cos(radians);
   float s = sin(radians);
 
@@ -238,7 +238,7 @@ __host__ __device__ Matrix3f Matrix3f::rotateY(float radians) {
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::rotateZ(float radians) {
+Matrix3f Matrix3f::rotateZ(float radians) {
   float c = cos(radians);
   float s = sin(radians);
 
@@ -246,17 +246,17 @@ __host__ __device__ Matrix3f Matrix3f::rotateZ(float radians) {
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::scaling(float sx, float sy, float sz) {
+Matrix3f Matrix3f::scaling(float sx, float sy, float sz) {
   return Matrix3f(sx, 0, 0, 0, sy, 0, 0, 0, sz);
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::uniformScaling(float s) {
+Matrix3f Matrix3f::uniformScaling(float s) {
   return Matrix3f(s, 0, 0, 0, s, 0, 0, 0, s);
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::rotation(const Vector3f &rDirection, float radians) {
+Matrix3f Matrix3f::rotation(const Vector3f &rDirection, float radians) {
   Vector3f normalizedDirection = rDirection.normalized();
 
   float cosTheta = cos(radians);
@@ -278,7 +278,7 @@ __host__ __device__ Matrix3f Matrix3f::rotation(const Vector3f &rDirection, floa
 }
 
 // static
-__host__ __device__ Matrix3f Matrix3f::rotation(const Quat4f &rq) {
+Matrix3f Matrix3f::rotation(const Quat4f &rq) {
   Quat4f q = rq.normalized();
 
   float xx = q.x() * q.x();
@@ -303,7 +303,7 @@ __host__ __device__ Matrix3f Matrix3f::rotation(const Quat4f &rq) {
 // Operators
 //////////////////////////////////////////////////////////////////////////
 
-__host__ __device__ Vector3f operator*(const Matrix3f &m, const Vector3f &v) {
+Vector3f operator*(const Matrix3f &m, const Vector3f &v) {
   Vector3f output(0, 0, 0);
 
   for (int i = 0; i < 3; ++i) {
@@ -315,7 +315,7 @@ __host__ __device__ Vector3f operator*(const Matrix3f &m, const Vector3f &v) {
   return output;
 }
 
-__host__ __device__ Matrix3f operator*(const Matrix3f &x, const Matrix3f &y) {
+Matrix3f operator*(const Matrix3f &x, const Matrix3f &y) {
   Matrix3f product;  // zeroes
 
   for (int i = 0; i < 3; ++i) {

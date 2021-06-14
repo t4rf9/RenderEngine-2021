@@ -8,22 +8,12 @@
 #include <iostream>
 #include <vecmath.h>
 
-#include "cuda_error.h"
-
 class Material {
 public:
     explicit Material(const Vector3f &d_color, const Vector3f &s_color, float shininess,
                       float reflect_coefficient, float refract_coefficient, float refractive_index);
 
     virtual ~Material() = default;
-
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
 
     virtual Vector3f getSpecularColor() const;
 

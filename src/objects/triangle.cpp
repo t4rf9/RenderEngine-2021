@@ -11,7 +11,7 @@ Triangle::Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Mate
     normal.normalize();
 }
 
-bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min) {
+bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min, uint_fast32_t &rand) {
     Vector3f S = vertices[0] - ray.getOrigin();
     const Vector3f &Rd = ray.getDirection();
 

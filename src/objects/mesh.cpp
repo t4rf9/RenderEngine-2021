@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min) {
+bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min, uint_fast32_t &rand) {
     if (!pBox->intersect(ray, t_min)) {
         return false;
     }
@@ -11,7 +11,7 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min) {
         TriangleIndex &triIndex = t[triId];
         Triangle triangle(v[triIndex[0]], v[triIndex[1]], v[triIndex[2]], material);
         triangle.setNormal(n[triId]);
-        result |= triangle.intersect(ray, hit, t_min);
+        result |= triangle.intersect(ray, hit, t_min, rand);
     }
     return result;
 }

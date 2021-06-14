@@ -1,7 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
-PROJECT(vecmath LANGUAGES CUDA)
-
-set(CMAKE_CUDA_ARCHITECTURES 75-real)
+PROJECT(vecmath LANGUAGES CXX)
 
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
@@ -18,13 +16,13 @@ SET(VECMATH_INCLUDES
         include/Vector4f.h)
 
 SET(VECMATH_SOURCES
-        src/Matrix2f.cu
-        src/Matrix3f.cu
-        src/Matrix4f.cu
-        src/Quat4f.cu
-        src/Vector2f.cu
-        src/Vector3f.cu
-        src/Vector4f.cu
+        src/Matrix2f.cpp
+        src/Matrix3f.cpp
+        src/Matrix4f.cpp
+        src/Quat4f.cpp
+        src/Vector2f.cpp
+        src/Vector3f.cpp
+        src/Vector4f.cpp
         )
 
 SET(CMAKE_CXX_STANDARD 17)

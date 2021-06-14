@@ -14,13 +14,10 @@
 #include <queue>
 #include <string>
 
-#include "cuda_error.h"
-
 const bool shadow = true;
 const bool reflect = true;
 const bool refract = true;
 
-//__global__
 void render(Image *image, Scene *scene, int x, int y) {
     // std::cout << "(" << x << ", " << y << ")" << std::endl;
 
@@ -31,8 +28,9 @@ void render(Image *image, Scene *scene, int x, int y) {
 
     Ray ray = camera->generateRay(Vector2f(x, y));
     Hit hit;
+    uint_fast32_t rand = 1;
     // 判断ray是否和场景有交点，并返回最近交点的数据，存储在hit中
-    bool hasIntersection = baseGroup->intersect(ray, hit, 0.f);
+    bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, rand);
 
     if (hasIntersection) {
         Vector3f finalColor = scene->getEnvironmentColor() * hit.getMaterial()->getDiffuseColor();
@@ -66,8 +64,9 @@ void render(Image *image, Scene *scene, int x, int y) {
                 float len = L.normalize();
                 // shadow
                 Hit tmp;
-                hasIntersection = shadow && baseGroup->intersect(
-                                                Ray(intersection + 1e-3 * L, L, 0, 1, 1), tmp, 0);
+                hasIntersection =
+                    shadow &&
+                    baseGroup->intersect(Ray(intersection + 1e-3 * L, L, 0, 1, 1), tmp, 0, rand);
                 if (!shadow || !hasIntersection || tmp.getT() >= len) {
                     // 计算局部光强
                     color += material->Shade(ray, hit, L, lightColor);
@@ -85,7 +84,7 @@ void render(Image *image, Scene *scene, int x, int y) {
             }
 
             // refract
-            if (refract && material->refractive() && depth < 10) {
+            if (refract && material->refractive() && depth < 2) {
                 float refractive_index = incident_refractive_index / exit_refractive_index;
                 float cos_out =
                     sqrt(1 - refractive_index * refractive_index * (1 - cos_in * cos_in));
@@ -101,7 +100,7 @@ void render(Image *image, Scene *scene, int x, int y) {
             }
             while (!Q.empty()) {
                 hit.clear();
-                hasIntersection = baseGroup->intersect(Q.front(), hit, 0);
+                hasIntersection = baseGroup->intersect(Q.front(), hit, 0, rand);
                 if (hasIntersection) {
                     ray = Q.front();
                     Q.pop();
@@ -149,13 +148,10 @@ int main(int argc, char *argv[]) {
     int width = camera->getWidth();
     int height = camera->getHeight();
 
-    dim3 block_size(8, 8);
-    dim3 num_blocks((width + block_size.x - 1) / block_size.x,
-                    (height + block_size.y - 1) / block_size.y);
-
     for (int x = 0; x < camera->getWidth(); x++) {
         for (int y = 0; y < camera->getHeight(); y++) {
-            // render<<<num_blocks, block_size>>>(image, scene);
+            x = 169;
+            y = 273;
             render(image, scene, x, y);
         }
     }

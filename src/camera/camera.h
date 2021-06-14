@@ -7,8 +7,6 @@
 
 #include "ray.h"
 
-#include "cuda_error.h"
-
 class Camera {
 public:
     Camera(const Vector3f &pos, const Vector3f &direction, const Vector3f &up, int imgW, int imgH);
@@ -17,14 +15,6 @@ public:
 
     // Generate rays for each screen-space coordinate
     virtual Ray generateRay(const Vector2f &point) = 0;
-
-    static void *operator new(std::size_t sz);
-
-    static void *operator new[](std::size_t sz);
-
-    static void operator delete(void *ptr);
-
-    static void operator delete[](void *ptr);
 
     inline int getWidth() const { return width; }
 

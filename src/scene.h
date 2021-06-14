@@ -3,8 +3,6 @@
 #include <cassert>
 #include <vecmath.h>
 
-#include "cuda_error.h"
-
 class Camera;
 class Light;
 class Group;
@@ -15,28 +13,20 @@ public:
 
     ~Scene();
 
-    static void *operator new(std::size_t sz);
+    inline Camera *getCamera() const { return camera; }
 
-    static void *operator new[](std::size_t sz);
+    inline Vector3f getBackgroundColor() const { return background_color; }
 
-    static void operator delete(void *ptr);
+    inline Vector3f getEnvironmentColor() const { return environment_color; }
 
-    static void operator delete[](void *ptr);
+    inline int getNumLights() const { return num_lights; }
 
-    __host__ __device__ inline Camera *getCamera() const { return camera; }
-
-    __host__ __device__ inline Vector3f getBackgroundColor() const { return background_color; }
-
-    __host__ __device__ inline Vector3f getEnvironmentColor() const { return environment_color; }
-
-    __host__ __device__ inline int getNumLights() const { return num_lights; }
-
-    __host__ __device__ inline Light *getLight(int i) const {
+    inline Light *getLight(int i) const {
         assert(i >= 0 && i < num_lights);
         return lights[i];
     }
 
-    __host__ __device__ inline Group *getGroup() const { return group; }
+    inline Group *getGroup() const { return group; }
 
     friend class SceneParser;
 

@@ -5,7 +5,7 @@ Sphere::Sphere() : center(0), radius(1), radius_squared(1) {}
 Sphere::Sphere(const Vector3f &center, float radius, Material *material)
     : Object3D(material), center(center), radius(radius), radius_squared(radius * radius) {}
 
-bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min) {
+bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min, uint_fast32_t &rand) {
     // origin lies anywhere
     Vector3f l = center - ray.getOrigin();
     bool inside = l.length() < radius;

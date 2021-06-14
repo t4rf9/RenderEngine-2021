@@ -16,7 +16,7 @@ public:
 
     ~Group() override;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    bool intersect(const Ray &r, Hit &h, float tmin, uint_fast32_t &rand) override;
 
     void addObject(int index, Object3D *obj);
 

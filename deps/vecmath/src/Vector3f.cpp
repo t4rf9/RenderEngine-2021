@@ -22,37 +22,37 @@ const Vector3f Vector3f::RIGHT = Vector3f(1, 0, 0);
 // static
 const Vector3f Vector3f::FORWARD = Vector3f(0, 0, -1);
 
-__host__ __device__ Vector3f::Vector3f(float f) {
+Vector3f::Vector3f(float f) {
     m_elements[0] = f;
     m_elements[1] = f;
     m_elements[2] = f;
 }
 
-__host__ __device__ Vector3f::Vector3f(float x, float y, float z) {
+Vector3f::Vector3f(float x, float y, float z) {
     m_elements[0] = x;
     m_elements[1] = y;
     m_elements[2] = z;
 }
 
-__host__ __device__ Vector3f::Vector3f(const Vector2f &xy, float z) {
+Vector3f::Vector3f(const Vector2f &xy, float z) {
     m_elements[0] = xy.x();
     m_elements[1] = xy.y();
     m_elements[2] = z;
 }
 
-__host__ __device__ Vector3f::Vector3f(float x, const Vector2f &yz) {
+Vector3f::Vector3f(float x, const Vector2f &yz) {
     m_elements[0] = x;
     m_elements[1] = yz.x();
     m_elements[2] = yz.y();
 }
 
-__host__ __device__ Vector3f::Vector3f(const Vector3f &rv) {
+Vector3f::Vector3f(const Vector3f &rv) {
     m_elements[0] = rv[0];
     m_elements[1] = rv[1];
     m_elements[2] = rv[2];
 }
 
-__host__ __device__ Vector3f &Vector3f::operator=(const Vector3f &rv) {
+Vector3f &Vector3f::operator=(const Vector3f &rv) {
     if (this != &rv) {
         m_elements[0] = rv[0];
         m_elements[1] = rv[1];
@@ -61,51 +61,51 @@ __host__ __device__ Vector3f &Vector3f::operator=(const Vector3f &rv) {
     return *this;
 }
 
-__host__ __device__ const float &Vector3f::operator[](int i) const { return m_elements[i]; }
+const float &Vector3f::operator[](int i) const { return m_elements[i]; }
 
-__host__ __device__ float &Vector3f::operator[](int i) { return m_elements[i]; }
+float &Vector3f::operator[](int i) { return m_elements[i]; }
 
-__host__ __device__ float &Vector3f::x() { return m_elements[0]; }
+float &Vector3f::x() { return m_elements[0]; }
 
-__host__ __device__ float &Vector3f::y() { return m_elements[1]; }
+float &Vector3f::y() { return m_elements[1]; }
 
-__host__ __device__ float &Vector3f::z() { return m_elements[2]; }
+float &Vector3f::z() { return m_elements[2]; }
 
-__host__ __device__ float Vector3f::x() const { return m_elements[0]; }
+float Vector3f::x() const { return m_elements[0]; }
 
-__host__ __device__ float Vector3f::y() const { return m_elements[1]; }
+float Vector3f::y() const { return m_elements[1]; }
 
-__host__ __device__ float Vector3f::z() const { return m_elements[2]; }
+float Vector3f::z() const { return m_elements[2]; }
 
-__host__ __device__ Vector2f Vector3f::xy() const { return Vector2f(m_elements[0], m_elements[1]); }
+Vector2f Vector3f::xy() const { return Vector2f(m_elements[0], m_elements[1]); }
 
-__host__ __device__ Vector2f Vector3f::xz() const { return Vector2f(m_elements[0], m_elements[2]); }
+Vector2f Vector3f::xz() const { return Vector2f(m_elements[0], m_elements[2]); }
 
-__host__ __device__ Vector2f Vector3f::yz() const { return Vector2f(m_elements[1], m_elements[2]); }
+Vector2f Vector3f::yz() const { return Vector2f(m_elements[1], m_elements[2]); }
 
-__host__ __device__ Vector3f Vector3f::xyz() const {
+Vector3f Vector3f::xyz() const {
     return Vector3f(m_elements[0], m_elements[1], m_elements[2]);
 }
 
-__host__ __device__ Vector3f Vector3f::yzx() const {
+Vector3f Vector3f::yzx() const {
     return Vector3f(m_elements[1], m_elements[2], m_elements[0]);
 }
 
-__host__ __device__ Vector3f Vector3f::zxy() const {
+Vector3f Vector3f::zxy() const {
     return Vector3f(m_elements[2], m_elements[0], m_elements[1]);
 }
 
-__host__ __device__ float Vector3f::length() const {
+float Vector3f::length() const {
     return sqrt(m_elements[0] * m_elements[0] + m_elements[1] * m_elements[1] +
                 m_elements[2] * m_elements[2]);
 }
 
-__host__ __device__ float Vector3f::squaredLength() const {
+float Vector3f::squaredLength() const {
     return (m_elements[0] * m_elements[0] + m_elements[1] * m_elements[1] +
             m_elements[2] * m_elements[2]);
 }
 
-__host__ __device__ float Vector3f::normalize() {
+float Vector3f::normalize() {
     float norm = length();
     m_elements[0] /= norm;
     m_elements[1] /= norm;
@@ -113,16 +113,16 @@ __host__ __device__ float Vector3f::normalize() {
     return norm;
 }
 
-__host__ __device__ Vector3f Vector3f::normalized() const {
+Vector3f Vector3f::normalized() const {
     float norm = length();
     return Vector3f(m_elements[0] / norm, m_elements[1] / norm, m_elements[2] / norm);
 }
 
-__host__ __device__ Vector2f Vector3f::homogenized() const {
+Vector2f Vector3f::homogenized() const {
     return Vector2f(m_elements[0] / m_elements[2], m_elements[1] / m_elements[2]);
 }
 
-__host__ __device__ void Vector3f::negate() {
+void Vector3f::negate() {
     m_elements[0] = -m_elements[0];
     m_elements[1] = -m_elements[1];
     m_elements[2] = -m_elements[2];
@@ -136,28 +136,28 @@ void Vector3f::print() const {
     printf("< %.4f, %.4f, %.4f >\n", m_elements[0], m_elements[1], m_elements[2]);
 }
 
-__host__ __device__ Vector3f &Vector3f::operator+=(const Vector3f &v) {
+Vector3f &Vector3f::operator+=(const Vector3f &v) {
     m_elements[0] += v.m_elements[0];
     m_elements[1] += v.m_elements[1];
     m_elements[2] += v.m_elements[2];
     return *this;
 }
 
-__host__ __device__ Vector3f &Vector3f::operator-=(const Vector3f &v) {
+Vector3f &Vector3f::operator-=(const Vector3f &v) {
     m_elements[0] -= v.m_elements[0];
     m_elements[1] -= v.m_elements[1];
     m_elements[2] -= v.m_elements[2];
     return *this;
 }
 
-__host__ __device__ Vector3f &Vector3f::operator*=(float f) {
+Vector3f &Vector3f::operator*=(float f) {
     m_elements[0] *= f;
     m_elements[1] *= f;
     m_elements[2] *= f;
     return *this;
 }
 
-__host__ __device__ Vector3f &Vector3f::operator*=(const Vector3f &v) {
+Vector3f &Vector3f::operator*=(const Vector3f &v) {
     m_elements[0] *= v.m_elements[0];
     m_elements[1] *= v.m_elements[1];
     m_elements[2] *= v.m_elements[2];
@@ -165,23 +165,23 @@ __host__ __device__ Vector3f &Vector3f::operator*=(const Vector3f &v) {
 }
 
 // static
-__host__ __device__ float Vector3f::dot(const Vector3f &v0, const Vector3f &v1) {
+float Vector3f::dot(const Vector3f &v0, const Vector3f &v1) {
     return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
 }
 
 // static
-__host__ __device__ Vector3f Vector3f::cross(const Vector3f &v0, const Vector3f &v1) {
+Vector3f Vector3f::cross(const Vector3f &v0, const Vector3f &v1) {
     return Vector3f(v0.y() * v1.z() - v0.z() * v1.y(), v0.z() * v1.x() - v0.x() * v1.z(),
                     v0.x() * v1.y() - v0.y() * v1.x());
 }
 
 // static
-__host__ __device__ Vector3f Vector3f::lerp(const Vector3f &v0, const Vector3f &v1, float alpha) {
+Vector3f Vector3f::lerp(const Vector3f &v0, const Vector3f &v1, float alpha) {
     return alpha * (v1 - v0) + v0;
 }
 
 // static
-__host__ __device__ Vector3f Vector3f::cubicInterpolate(const Vector3f &p0, const Vector3f &p1,
+Vector3f Vector3f::cubicInterpolate(const Vector3f &p0, const Vector3f &p1,
                                                         const Vector3f &p2, const Vector3f &p3,
                                                         float t) {
     // geometric construction:
@@ -202,54 +202,54 @@ __host__ __device__ Vector3f Vector3f::cubicInterpolate(const Vector3f &p0, cons
     return Vector3f::lerp(p0p1_p1p2, p1p2_p2p3, t);
 }
 
-__host__ __device__ Vector3f operator+(const Vector3f &v0, const Vector3f &v1) {
+Vector3f operator+(const Vector3f &v0, const Vector3f &v1) {
     return Vector3f(v0[0] + v1[0], v0[1] + v1[1], v0[2] + v1[2]);
 }
 
-__host__ __device__ Vector3f operator-(const Vector3f &v0, const Vector3f &v1) {
+Vector3f operator-(const Vector3f &v0, const Vector3f &v1) {
     return Vector3f(v0[0] - v1[0], v0[1] - v1[1], v0[2] - v1[2]);
 }
 
-__host__ __device__ Vector3f operator*(const Vector3f &v0, const Vector3f &v1) {
+Vector3f operator*(const Vector3f &v0, const Vector3f &v1) {
     return Vector3f(v0[0] * v1[0], v0[1] * v1[1], v0[2] * v1[2]);
 }
 
-__host__ __device__ Vector3f operator/(const Vector3f &v0, const Vector3f &v1) {
+Vector3f operator/(const Vector3f &v0, const Vector3f &v1) {
     return Vector3f(v0[0] / v1[0], v0[1] / v1[1], v0[2] / v1[2]);
 }
 
-__host__ __device__ Vector3f operator-(const Vector3f &v) { return Vector3f(-v[0], -v[1], -v[2]); }
+Vector3f operator-(const Vector3f &v) { return Vector3f(-v[0], -v[1], -v[2]); }
 
-__host__ __device__ Vector3f operator*(float f, const Vector3f &v) {
+Vector3f operator*(float f, const Vector3f &v) {
     return Vector3f(v[0] * f, v[1] * f, v[2] * f);
 }
 
-__host__ __device__ Vector3f operator*(const Vector3f &v, float f) {
+Vector3f operator*(const Vector3f &v, float f) {
     return Vector3f(v[0] * f, v[1] * f, v[2] * f);
 }
 
-__host__ __device__ Vector3f operator/(const Vector3f &v, float f) {
+Vector3f operator/(const Vector3f &v, float f) {
     return Vector3f(v[0] / f, v[1] / f, v[2] / f);
 }
 
-__host__ __device__ bool operator==(const Vector3f &v0, const Vector3f &v1) {
+bool operator==(const Vector3f &v0, const Vector3f &v1) {
     return v0.x() == v1.x() && v0.y() == v1.y() && v0.z() == v1.z();
 }
 
-__host__ __device__ bool operator!=(const Vector3f &v0, const Vector3f &v1) { return !(v0 == v1); }
+bool operator!=(const Vector3f &v0, const Vector3f &v1) { return !(v0 == v1); }
 
-__host__ __device__ bool operator<(const Vector3f &v0, const Vector3f &v1) {
+bool operator<(const Vector3f &v0, const Vector3f &v1) {
     return v0.x() < v1.x() && v0.y() < v1.y() && v0.z() < v1.z();
 }
 
-__host__ __device__ bool operator>(const Vector3f &v0, const Vector3f &v1) {
+bool operator>(const Vector3f &v0, const Vector3f &v1) {
     return v0.x() > v1.x() && v0.y() > v1.y() && v0.z() < v1.z();
 }
 
-__host__ __device__ bool operator<=(const Vector3f &v0, const Vector3f &v1) {
+bool operator<=(const Vector3f &v0, const Vector3f &v1) {
     return v0.x() <= v1.x() && v0.y() <= v1.y() && v0.z() <= v1.z();
 }
 
-__host__ __device__ bool operator>=(const Vector3f &v0, const Vector3f &v1) {
+bool operator>=(const Vector3f &v0, const Vector3f &v1) {
     return v0.x() >= v1.x() && v0.y() >= v1.y() && v0.z() >= v1.z();
 }

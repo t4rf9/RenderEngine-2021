@@ -18,28 +18,28 @@ const Quat4f Quat4f::ZERO = Quat4f(0, 0, 0, 0);
 // static
 const Quat4f Quat4f::IDENTITY = Quat4f(1, 0, 0, 0);
 
-__host__ __device__ Quat4f::Quat4f() {
+Quat4f::Quat4f() {
     m_elements[0] = 0;
     m_elements[1] = 0;
     m_elements[2] = 0;
     m_elements[3] = 0;
 }
 
-__host__ __device__ Quat4f::Quat4f(float w, float x, float y, float z) {
+Quat4f::Quat4f(float w, float x, float y, float z) {
     m_elements[0] = w;
     m_elements[1] = x;
     m_elements[2] = y;
     m_elements[3] = z;
 }
 
-__host__ __device__ Quat4f::Quat4f(const Quat4f &rq) {
+Quat4f::Quat4f(const Quat4f &rq) {
     m_elements[0] = rq.m_elements[0];
     m_elements[1] = rq.m_elements[1];
     m_elements[2] = rq.m_elements[2];
     m_elements[3] = rq.m_elements[3];
 }
 
-__host__ __device__ Quat4f &Quat4f::operator=(const Quat4f &rq) {
+Quat4f &Quat4f::operator=(const Quat4f &rq) {
     if (this != (&rq)) {
         m_elements[0] = rq.m_elements[0];
         m_elements[1] = rq.m_elements[1];
@@ -49,48 +49,48 @@ __host__ __device__ Quat4f &Quat4f::operator=(const Quat4f &rq) {
     return (*this);
 }
 
-__host__ __device__ Quat4f::Quat4f(const Vector3f &v) {
+Quat4f::Quat4f(const Vector3f &v) {
     m_elements[0] = 0;
     m_elements[1] = v[0];
     m_elements[2] = v[1];
     m_elements[3] = v[2];
 }
 
-__host__ __device__ Quat4f::Quat4f(const Vector4f &v) {
+Quat4f::Quat4f(const Vector4f &v) {
     m_elements[0] = v[0];
     m_elements[1] = v[1];
     m_elements[2] = v[2];
     m_elements[3] = v[3];
 }
 
-__host__ __device__ const float &Quat4f::operator[](int i) const { return m_elements[i]; }
+const float &Quat4f::operator[](int i) const { return m_elements[i]; }
 
-__host__ __device__ float &Quat4f::operator[](int i) { return m_elements[i]; }
+float &Quat4f::operator[](int i) { return m_elements[i]; }
 
-__host__ __device__ float Quat4f::w() const { return m_elements[0]; }
+float Quat4f::w() const { return m_elements[0]; }
 
-__host__ __device__ float Quat4f::x() const { return m_elements[1]; }
+float Quat4f::x() const { return m_elements[1]; }
 
-__host__ __device__ float Quat4f::y() const { return m_elements[2]; }
+float Quat4f::y() const { return m_elements[2]; }
 
-__host__ __device__ float Quat4f::z() const { return m_elements[3]; }
+float Quat4f::z() const { return m_elements[3]; }
 
-__host__ __device__ Vector3f Quat4f::xyz() const {
+Vector3f Quat4f::xyz() const {
     return Vector3f(m_elements[1], m_elements[2], m_elements[3]);
 }
 
-__host__ __device__ Vector4f Quat4f::wxyz() const {
+Vector4f Quat4f::wxyz() const {
     return Vector4f(m_elements[0], m_elements[1], m_elements[2], m_elements[3]);
 }
 
-__host__ __device__ float Quat4f::abs() const { return sqrt(absSquared()); }
+float Quat4f::abs() const { return sqrt(absSquared()); }
 
-__host__ __device__ float Quat4f::absSquared() const {
+float Quat4f::absSquared() const {
     return (m_elements[0] * m_elements[0] + m_elements[1] * m_elements[1] +
             m_elements[2] * m_elements[2] + m_elements[3] * m_elements[3]);
 }
 
-__host__ __device__ void Quat4f::normalize() {
+void Quat4f::normalize() {
     float reciprocalAbs = 1.f / abs();
 
     m_elements[0] *= reciprocalAbs;
@@ -99,23 +99,23 @@ __host__ __device__ void Quat4f::normalize() {
     m_elements[3] *= reciprocalAbs;
 }
 
-__host__ __device__ Quat4f Quat4f::normalized() const {
+Quat4f Quat4f::normalized() const {
     Quat4f q(*this);
     q.normalize();
     return q;
 }
 
-__host__ __device__ void Quat4f::conjugate() {
+void Quat4f::conjugate() {
     m_elements[1] = -m_elements[1];
     m_elements[2] = -m_elements[2];
     m_elements[3] = -m_elements[3];
 }
 
-__host__ __device__ Quat4f Quat4f::conjugated() const {
+Quat4f Quat4f::conjugated() const {
     return Quat4f(m_elements[0], -m_elements[1], -m_elements[2], -m_elements[3]);
 }
 
-__host__ __device__ void Quat4f::invert() {
+void Quat4f::invert() {
     Quat4f inverse = conjugated() * (1.0f / absSquared());
 
     m_elements[0] = inverse.m_elements[0];
@@ -124,9 +124,9 @@ __host__ __device__ void Quat4f::invert() {
     m_elements[3] = inverse.m_elements[3];
 }
 
-__host__ __device__ Quat4f Quat4f::inverse() const { return conjugated() * (1.0f / absSquared()); }
+Quat4f Quat4f::inverse() const { return conjugated() * (1.0f / absSquared()); }
 
-__host__ __device__ Quat4f Quat4f::log() const {
+Quat4f Quat4f::log() const {
     float len = sqrt(m_elements[1] * m_elements[1] + m_elements[2] * m_elements[2] +
                      m_elements[3] * m_elements[3]);
 
@@ -138,7 +138,7 @@ __host__ __device__ Quat4f Quat4f::log() const {
     }
 }
 
-__host__ __device__ Quat4f Quat4f::exp() const {
+Quat4f Quat4f::exp() const {
     float theta = sqrt(m_elements[1] * m_elements[1] + m_elements[2] * m_elements[2] +
                        m_elements[3] * m_elements[3]);
 
@@ -151,7 +151,7 @@ __host__ __device__ Quat4f Quat4f::exp() const {
     }
 }
 
-__host__ __device__ Vector3f Quat4f::getAxisAngle(float *radiansOut) {
+Vector3f Quat4f::getAxisAngle(float *radiansOut) {
     float theta = acos(w()) * 2;
     float vectorNorm = sqrt(x() * x() + y() * y() + z() * z());
     float reciprocalVectorNorm = 1.f / vectorNorm;
@@ -161,7 +161,7 @@ __host__ __device__ Vector3f Quat4f::getAxisAngle(float *radiansOut) {
                     z() * reciprocalVectorNorm);
 }
 
-__host__ __device__ void Quat4f::setAxisAngle(float radians, const Vector3f &axis) {
+void Quat4f::setAxisAngle(float radians, const Vector3f &axis) {
     m_elements[0] = cos(radians / 2);
 
     float sinHalfTheta = sin(radians / 2);
@@ -179,17 +179,17 @@ void Quat4f::print() {
 }
 
 // static
-__host__ __device__ float Quat4f::dot(const Quat4f &q0, const Quat4f &q1) {
+float Quat4f::dot(const Quat4f &q0, const Quat4f &q1) {
     return (q0.w() * q1.w() + q0.x() * q1.x() + q0.y() * q1.y() + q0.z() * q1.z());
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::lerp(const Quat4f &q0, const Quat4f &q1, float alpha) {
+Quat4f Quat4f::lerp(const Quat4f &q0, const Quat4f &q1, float alpha) {
     return ((q0 + alpha * (q1 - q0)).normalized());
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::slerp(const Quat4f &a, const Quat4f &b, float t,
+Quat4f Quat4f::slerp(const Quat4f &a, const Quat4f &b, float t,
                                          bool allowFlip) {
     float cosAngle = Quat4f::dot(a, b);
 
@@ -218,7 +218,7 @@ __host__ __device__ Quat4f Quat4f::slerp(const Quat4f &a, const Quat4f &b, float
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::squad(const Quat4f &a, const Quat4f &tanA, const Quat4f &tanB,
+Quat4f Quat4f::squad(const Quat4f &a, const Quat4f &tanA, const Quat4f &tanB,
                                          const Quat4f &b, float t) {
     Quat4f ab = Quat4f::slerp(a, b, t);
     Quat4f tangent = Quat4f::slerp(tanA, tanB, t, false);
@@ -226,7 +226,7 @@ __host__ __device__ Quat4f Quat4f::squad(const Quat4f &a, const Quat4f &tanA, co
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::cubicInterpolate(const Quat4f &q0, const Quat4f &q1,
+Quat4f Quat4f::cubicInterpolate(const Quat4f &q0, const Quat4f &q1,
                                                     const Quat4f &q2, const Quat4f &q3, float t) {
     // geometric construction:
     //            t
@@ -247,14 +247,14 @@ __host__ __device__ Quat4f Quat4f::cubicInterpolate(const Quat4f &q0, const Quat
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::logDifference(const Quat4f &a, const Quat4f &b) {
+Quat4f Quat4f::logDifference(const Quat4f &a, const Quat4f &b) {
     Quat4f diff = a.inverse() * b;
     diff.normalize();
     return diff.log();
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::squadTangent(const Quat4f &before, const Quat4f &center,
+Quat4f Quat4f::squadTangent(const Quat4f &before, const Quat4f &center,
                                                 const Quat4f &after) {
     Quat4f l1 = Quat4f::logDifference(center, before);
     Quat4f l2 = Quat4f::logDifference(center, after);
@@ -269,7 +269,7 @@ __host__ __device__ Quat4f Quat4f::squadTangent(const Quat4f &before, const Quat
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::fromRotationMatrix(const Matrix3f &m) {
+Quat4f Quat4f::fromRotationMatrix(const Matrix3f &m) {
     float x;
     float y;
     float z;
@@ -313,13 +313,13 @@ __host__ __device__ Quat4f Quat4f::fromRotationMatrix(const Matrix3f &m) {
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::fromRotatedBasis(const Vector3f &x, const Vector3f &y,
+Quat4f Quat4f::fromRotatedBasis(const Vector3f &x, const Vector3f &y,
                                                     const Vector3f &z) {
     return fromRotationMatrix(Matrix3f(x, y, z));
 }
 
 // static
-__host__ __device__ Quat4f Quat4f::randomRotation(float u0, float u1, float u2) {
+Quat4f Quat4f::randomRotation(float u0, float u1, float u2) {
     float z = u0;
     float theta = static_cast<float>(2.f * M_PI * u1);
     float r = sqrt(1.f - z * z);
@@ -332,25 +332,25 @@ __host__ __device__ Quat4f Quat4f::randomRotation(float u0, float u1, float u2) 
 // Operators
 //////////////////////////////////////////////////////////////////////////
 
-__host__ __device__ Quat4f operator+(const Quat4f &q0, const Quat4f &q1) {
+Quat4f operator+(const Quat4f &q0, const Quat4f &q1) {
     return Quat4f(q0.w() + q1.w(), q0.x() + q1.x(), q0.y() + q1.y(), q0.z() + q1.z());
 }
 
-__host__ __device__ Quat4f operator-(const Quat4f &q0, const Quat4f &q1) {
+Quat4f operator-(const Quat4f &q0, const Quat4f &q1) {
     return Quat4f(q0.w() - q1.w(), q0.x() - q1.x(), q0.y() - q1.y(), q0.z() - q1.z());
 }
 
-__host__ __device__ Quat4f operator*(const Quat4f &q0, const Quat4f &q1) {
+Quat4f operator*(const Quat4f &q0, const Quat4f &q1) {
     return Quat4f(q0.w() * q1.w() - q0.x() * q1.x() - q0.y() * q1.y() - q0.z() * q1.z(),
                   q0.w() * q1.x() + q0.x() * q1.w() + q0.y() * q1.z() - q0.z() * q1.y(),
                   q0.w() * q1.y() - q0.x() * q1.z() + q0.y() * q1.w() + q0.z() * q1.x(),
                   q0.w() * q1.z() + q0.x() * q1.y() - q0.y() * q1.x() + q0.z() * q1.w());
 }
 
-__host__ __device__ Quat4f operator*(float f, const Quat4f &q) {
+Quat4f operator*(float f, const Quat4f &q) {
     return Quat4f(f * q.w(), f * q.x(), f * q.y(), f * q.z());
 }
 
-__host__ __device__ Quat4f operator*(const Quat4f &q, float f) {
+Quat4f operator*(const Quat4f &q, float f) {
     return Quat4f(f * q.w(), f * q.x(), f * q.y(), f * q.z());
 }
