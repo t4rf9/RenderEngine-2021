@@ -15,7 +15,7 @@ __global__ void render(Image *image, Scene **p_scene) {
 
     int pixel_index = y * width + x;
 
-    RandState local_rand_state(pixel_index);
+    RandState local_rand_state = 1;
     // Each thread gets same seed, a different sequence number, no offset
     // curand_init(rand_seed, pixel_index, 0, &local_rand_state);
 
@@ -25,6 +25,10 @@ __global__ void render(Image *image, Scene **p_scene) {
     Ray ray = camera->generateRay(Vector2f(x, y));
     Hit hit;
     // 判断ray是否和场景有交点，并返回最近交点的数据，存储在hit中
+
+    if (x == 169 && y == 273) {
+        x = 169;
+    }
     bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, local_rand_state);
 
     Vector3f finalColor;
@@ -32,8 +36,12 @@ __global__ void render(Image *image, Scene **p_scene) {
         finalColor = scene->getEnvironmentColor() * hit.getMaterial()->getDiffuseColor();
 
         const int refract_depth_limit = 5;
-        const int reflect_depth_limit = 4;
-        Ray Q[reflect_depth_limit + refract_depth_limit];
+        const int reflect_depth_limit = 5;
+        const int depth_limit =
+            (refract_depth_limit > reflect_depth_limit ? refract_depth_limit
+                                                       : reflect_depth_limit) +
+            1;
+        Ray Q[depth_limit];
         int q_top = 0;
         while (true) {
             auto *material = hit.getMaterial();
@@ -76,7 +84,8 @@ __global__ void render(Image *image, Scene **p_scene) {
             finalColor += color;
 
             // reflect
-            if (reflect && material->reflective() && depth < reflect_depth_limit) {
+            if (reflect && material->reflective() && depth < reflect_depth_limit &&
+                weight > 1e-2f) {
                 Vector3f reflect_direction = 2.f * cos_in * normal + incident_direction;
                 Q[q_top++].set(intersection + 1e-3f * reflect_direction,
                                reflect_direction, depth + 1,
@@ -85,7 +94,8 @@ __global__ void render(Image *image, Scene **p_scene) {
             }
 
             // refract
-            if (refract && material->refractive() && depth < refract_depth_limit) {
+            if (refract && material->refractive() && depth < refract_depth_limit &&
+                weight > 1e-2f) {
                 float refractive_index =
                     incident_refractive_index / exit_refractive_index;
                 float cos_out = sqrt(1.f - refractive_index * refractive_index *

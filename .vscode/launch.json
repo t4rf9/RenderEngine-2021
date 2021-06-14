@@ -8,8 +8,8 @@
             // Resolved by CMake Tools:
             "program": "${command:cmake.launchTargetPath}",
             "args": [
-                "testcases/scene_test.txt",
-                "output/test.bmp"
+                "testcases/scene09_norm.txt",
+                "output/scene09.bmp"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

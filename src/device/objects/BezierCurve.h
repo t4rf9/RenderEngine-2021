@@ -14,5 +14,4 @@ public:
 
 private:
     int n;
-    float **B;
 };

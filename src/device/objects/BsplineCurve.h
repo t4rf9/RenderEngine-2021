@@ -18,5 +18,4 @@ protected:
     float *knots;
 
 private:
-    float **B;
 };

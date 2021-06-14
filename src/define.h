@@ -14,6 +14,7 @@ const bool refract = true;
 // typedef curandStatePhilox4_32_10_t RandState;
 // typedef curandStateSobol32_t RandState;
 
-typedef Random RandState;
+//typedef Random RandState;
+typedef uint_fast32_t RandState;
 
 const int rand_seed = 2021;

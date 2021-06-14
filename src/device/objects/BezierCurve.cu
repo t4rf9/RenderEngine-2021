@@ -10,21 +10,16 @@ __device__ BezierCurve::BezierCurve(Vector3f *points, int num_controls)
     */
 
     n = num_controls - 1;
-
-    B = new float *[num_controls];
-    for (int i = 0; i < num_controls; i++) {
-        B[i] = new float[i + 1];
-    }
 }
 
-__device__ BezierCurve::~BezierCurve() {
-    for (int i = 0; i <= n; i++) {
-        delete[] B[i];
-    }
-    delete[] B;
-}
+__device__ BezierCurve::~BezierCurve() {}
 
 __device__ CurvePoint BezierCurve::curve_point_at_t(float t) {
+    float **B = new float *[num_controls];
+    for (int i = 0; i < num_controls; i++) {
+        B[i] = new float[i + 1];
+    };
+
     // calculate B[p][q] = B_{q, p}(t)
     B[0][0] = 1.f;
     for (int p = 1; p <= n; p++) {
@@ -45,6 +40,11 @@ __device__ CurvePoint BezierCurve::curve_point_at_t(float t) {
         T += B[n - 1][j] * (controls[j + 1] - controls[j]);
     }
     T *= n;
+
+    for (int i = 0; i <= n; i++) {
+        delete[] B[i];
+    }
+    delete[] B;
 
     return {V, T};
 }
