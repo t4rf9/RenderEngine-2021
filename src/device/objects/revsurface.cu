@@ -41,7 +41,7 @@ __device__ RevSurface::~RevSurface() {
     delete pBound;
 }
 
-__device__ const int repeat_limit = 50000;
+__device__ const int repeat_limit = 10000;
 __device__ const int iterate_limit = 500;
 
 //__device__ const float A[20] = {0.025f, 0.075f, 0.125f, 0.175f, 0.225f, 0.275f, 0.325f,
@@ -63,8 +63,9 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
-                   20.f * curand_uniform(&rand_state) - 10.f);
+        // Vector3f x(t_min + curand_uniform(&rand_state),
+        // curand_uniform(&rand_state), 20.f * curand_uniform(&rand_state) - 10.f);
+        Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
