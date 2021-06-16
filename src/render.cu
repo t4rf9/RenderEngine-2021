@@ -17,7 +17,7 @@ __global__ void render(Image *image, Scene **p_scene) {
 
     RandState local_rand_state;
     // Each thread gets same seed, a different sequence number, no offset
-    // curand_init(rand_seed, pixel_index, 0, &local_rand_state);
+    //curand_init(rand_seed, pixel_index, 0, &local_rand_state);
 
     Group *baseGroup = scene->getGroup();
 
