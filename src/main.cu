@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     dim3 num_blocks((width + block_size.x - 1) / block_size.x,
                     (height + block_size.y - 1) / block_size.y);
     printf("render\n");
-    render<<<num_blocks, block_size>>>(image, p_scene);
+    render<<<num_blocks, block_size, 49152>>>(image, p_scene);
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
 
