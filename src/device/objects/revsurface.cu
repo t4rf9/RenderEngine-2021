@@ -60,21 +60,11 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        // Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
-        //           20.f * curand_uniform(&rand_state) - 10.f);
         Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
-        // Vector3f x;
 
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
-
-        // rand_state = rand_state * 16807 % 2147483647;
-        // v = 20.f * float(rand_state) / 2147483647.f - 10.f;
-        // rand_state = rand_state * 16807 % 2147483647;
-        // u = float(rand_state) / 2147483647.f;
-        // rand_state = rand_state * 16807 % 2147483647;
-        // t = t_min + float(rand_state) / 2147483647.f;
 
         int count = 0;
         while (count++ < iterate_limit && 0.f <= u && u <= 1.f && t >= t_min) {
@@ -105,6 +95,53 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
         }
     }
     return res;
+}
+
+__device__ bool RevSurface::intersect(const Ray &ray, float t_min, float t_max,
+                                      RandState &rand_state) {
+    // PA3 optional: implement this for the ray-tracing routine using G-N
+    // iteration.
+    Vector3f d = ray.getDirection();
+    Vector3f o = ray.getOrigin();
+
+    // first check intersection with bounding object
+    if (!pBound->intersect(ray, t_min)) {
+        return false;
+    }
+
+    for (int i = 0; i < repeat_limit; i++) {
+        Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
+
+        auto &t = x[0];
+        auto &u = x[1];
+        auto &v = x[2];
+
+        int count = 0;
+        while (count++ < iterate_limit && 0.f <= u && u <= 1.f && t >= t_min) {
+            float v2 = v * v;
+            float divisor = 1.f + v2;
+            float sinv = 2.f * v / divisor;
+            float cosv = (1.f - v2) / divisor;
+            CurvePoint f = pCurve->curve_point_at_t(u);
+            Vector3f F = o + t * d - Vector3f(cosv * f.V.x(), f.V.y(), sinv * f.V.x());
+
+            Vector3f T_y = Vector3f(cosv * f.T.x(), f.T.y(), sinv * f.T.x());
+            if (F.length() < 1e-6f) {
+                if (t <= t_min || t >= t_max) {
+                    break;
+                }
+                return true;
+            }
+
+            Matrix3f F_prime = Matrix3f(d, -T_y,
+                                        Vector3f((2.f * sinv / divisor) * f.V[0], 0.f,
+                                                 -((2.f * cosv) / divisor) * f.V[0]));
+            Vector3f dx = F_prime.inverse() * F;
+
+            x -= dx;
+        }
+    }
+    return false;
 }
 
 /*

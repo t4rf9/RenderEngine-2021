@@ -15,6 +15,21 @@ __device__ bool Mesh::intersect(const Ray &ray, Hit &hit, float t_min,
     return result;
 }
 
+__device__ bool Mesh::intersect(const Ray &ray, float t_min, float t_max,
+                                RandState &rand_state) {
+    if (!pBox->intersect(ray, t_min)) {
+        return false;
+    }
+
+    // @TODO Optional: Change this brute force method into a faster one.
+    for (int i = 0; i < num_faces; ++i) {
+        if (faces[i]->intersect(ray, t_min, t_max, rand_state)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 __device__ Mesh::Mesh(Vector3f *vertices, int num_vertices, dim3 *face_indices,
                       int num_faces, Material *material)
     : Object3D(material), vertices(vertices), num_vertices(num_vertices),

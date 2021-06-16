@@ -66,12 +66,11 @@ __global__ void render(Image *image, Scene **p_scene) {
                 light->getIllumination(intersection, L, lightColor);
                 float len = L.normalize();
                 // shadow
-                Hit tmp;
-                hasIntersection =
+                bool shadowed =
                     shadow &&
                     baseGroup->intersect(Ray(intersection + 1e-2f * L, L, 0, 1.f, 1.f),
-                                         tmp, 0.f, local_rand_state);
-                if (!shadow || !hasIntersection || tmp.getT() >= len) {
+                                         0.f, len, local_rand_state);
+                if (!shadowed) {
                     // 计算局部光强
                     color += material->Shade(ray, hit, L, lightColor);
                 }

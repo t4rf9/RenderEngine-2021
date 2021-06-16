@@ -20,3 +20,10 @@ __device__ bool Plane::intersect(const Ray &ray, Hit &hit, float t_min,
     hit.set(t, material, normal);
     return true;
 }
+
+__device__ bool Plane::intersect(const Ray &ray, float t_min, float t_max,
+                                 RandState &rand_state) {
+    float t = -(d + Vector3f::dot(normal, ray.getOrigin())) /
+              Vector3f::dot(normal, ray.getDirection());
+    return t_min < t && t < t_max;
+}

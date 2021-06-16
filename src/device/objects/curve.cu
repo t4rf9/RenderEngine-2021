@@ -30,6 +30,16 @@ __device__ Curve::~Curve() {
     delete pBox;
 }
 
+__device__ bool Curve::intersect(const Ray &ray, Hit &hit, float t_min,
+                                 RandState &rand_state) {
+    return false;
+}
+
+__device__ bool Curve::intersect(const Ray &ray, float t_min, float t_max,
+                                 RandState &rand_state) {
+    return false;
+}
+
 __device__ bool Curve::IsFlat() const {
     for (int i = 0; i < num_controls; i++) {
         if (controls[i].z() != 0.0f) {

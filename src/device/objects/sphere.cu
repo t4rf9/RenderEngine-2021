@@ -40,3 +40,27 @@ __device__ bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min,
 
     return true;
 }
+
+__device__ bool Sphere::intersect(const Ray &ray, float t_min, float t_max,
+                                  RandState &rand_state) {
+    // origin lies anywhere
+    Vector3f l = center - ray.getOrigin();
+    bool inside = l.length() < radius;
+    bool on = l.length() == radius;
+
+    float tp = Vector3f::dot(l, ray.getDirection());
+    if (!inside && tp <= 0.f) {
+        return false;
+    }
+
+    float d_squared = l.squaredLength() - tp * tp;
+    if (d_squared > radius_squared) {
+        return false;
+    }
+
+    float dt = std::sqrt(radius_squared - d_squared);
+
+    float t = tp + ((inside || on) ? dt : -dt);
+
+    return t_min < t && t < t_max;
+}

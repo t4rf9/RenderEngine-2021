@@ -21,4 +21,15 @@ __device__ bool Group::intersect(const Ray &ray, Hit &hit, float t_min,
     return res;
 }
 
+__device__ bool Group::intersect(const Ray &ray, float t_min, float t_max,
+                                 RandState &rand_state) {
+    for (int i = 0; i < num_objects; i++) {
+        if (objects[i] != nullptr &&
+            objects[i]->intersect(ray, t_min, t_max, rand_state)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 __device__ void Group::addObject(int index, Object3D *obj) { objects[index] = obj; }

@@ -17,6 +17,9 @@ public:
 
     __device__ bool intersect(const Ray &ray, Hit &hit, float t_min,
                               RandState &rand_state) override;
+
+    __device__ bool intersect(const Ray &ray, float t_min, float t_max,
+                              RandState &rand_state) override;
 };
 
 #endif // REVSURFACE_HPP

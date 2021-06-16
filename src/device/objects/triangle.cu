@@ -43,3 +43,34 @@ __device__ bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min,
 
     return true;
 }
+
+__device__ bool Triangle::intersect(const Ray &ray, float t_min, float t_max,
+                                    RandState &rand_state) {
+    Vector3f S = vertices[0] - ray.getOrigin();
+    const Vector3f &Rd = ray.getDirection();
+
+    Matrix3f divisor_mat(Rd, E1, E2);
+    float divisor = divisor_mat.determinant();
+
+    Matrix3f mat1(S, E1, E2);
+    Matrix3f mat2(Rd, S, E2);
+    Matrix3f mat3(Rd, E1, S);
+
+    float t = mat1.determinant() / divisor;
+    float b = mat2.determinant() / divisor;
+    float c = mat3.determinant() / divisor;
+    if (t <= t_min || t >= t_max) {
+        return false;
+    }
+
+    if (b < 0.f || b > 1.f) {
+        return false;
+    }
+
+    if (c < 0.f || c > 1.f || b + c > 1.f) {
+        return false;
+    }
+
+    return t_min < t && t < t_max && 0.f <= b && b <= 1.f && 0.f <= c && c <= 1.f &&
+           b + c <= 1.f;
+}

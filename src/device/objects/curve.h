@@ -30,15 +30,16 @@ public:
 
     __device__ virtual ~Curve();
 
-    __device__ inline bool intersect(const Ray &ray, Hit &hit, float t_min,
-                                     RandState &rand_state) override {
-        return false;
-    }
+    __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,
+                                      RandState &rand_state) override;
+
+    __device__ virtual bool intersect(const Ray &ray, float t_min, float t_max,
+                                      RandState &rand_state) override;
 
     __device__ bool IsFlat() const;
 
     //__device__ virtual void discretize(int resolution, std::vector<CurvePoint> &data) =
-    //0;
+    // 0;
 
     __device__ virtual CurvePoint curve_point_at_t(float t) = 0;
 

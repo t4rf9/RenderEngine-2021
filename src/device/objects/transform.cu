@@ -21,7 +21,7 @@ __device__ bool Transform::intersect(const Ray &ray, Hit &hit, float t_min,
     float trDirLen = trDirection.normalize();
     Ray tr(trSource, trDirection, ray.get_depth(), ray.get_weight(),
            ray.get_incident_refractive_index());
-    bool inter = o->intersect(tr, hit, t_min, rand_state);
+    bool inter = o->intersect(tr, hit, t_min * trDirLen, rand_state);
     if (inter) {
         // n^T t = 0
         // => [n; 0]^T [t; 0] = 0
@@ -31,4 +31,14 @@ __device__ bool Transform::intersect(const Ray &ray, Hit &hit, float t_min,
                 transformDirection(transform.transposed(), hit.getNormal()).normalized());
     }
     return inter;
+}
+
+__device__ bool Transform::intersect(const Ray &ray, float t_min, float t_max,
+                                     RandState &rand_state) {
+    Vector3f trSource = transformPoint(transform, ray.getOrigin());
+    Vector3f trDirection = transformDirection(transform, ray.getDirection());
+    float trDirLen = trDirection.normalize();
+    Ray tr(trSource, trDirection, ray.get_depth(), ray.get_weight(),
+           ray.get_incident_refractive_index());
+    return o->intersect(tr, t_min * trDirLen, t_max * trDirLen, rand_state);
 }

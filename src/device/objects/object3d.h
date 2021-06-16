@@ -21,6 +21,9 @@ public:
     __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,
                                       RandState &rand_state) = 0;
 
+    __device__ virtual bool intersect(const Ray &ray, float t_min, float t_max,
+                                      RandState &rand_state) = 0;
+
 protected:
     Material *material;
 };
