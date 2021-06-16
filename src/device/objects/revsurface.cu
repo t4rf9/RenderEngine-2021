@@ -1,3 +1,4 @@
+#include "device/random.h"
 #include "revsurface.h"
 #include <curand_kernel.h>
 
@@ -41,8 +42,8 @@ __device__ RevSurface::~RevSurface() {
     delete pBound;
 }
 
-__device__ const int repeat_limit = 1000;
-__device__ const int iterate_limit = 500;
+__device__ const int repeat_limit = 800;
+__device__ const int iterate_limit = 200;
 
 __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
                                       RandState &rand_state) {
@@ -59,21 +60,21 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        // Vector3f x(t_min + curand_uniform(&rand_state),
-        // curand_uniform(&rand_state), 20.f * curand_uniform(&rand_state) - 10.f);
-        // Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
-        Vector3f x;
+        // Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
+        //           20.f * curand_uniform(&rand_state) - 10.f);
+        Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
+        // Vector3f x;
 
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
 
-        rand_state = rand_state * 16807 % 2147483647;
-        v = 20.f * float(rand_state) / 2147483647.f - 10.f;
-        rand_state = rand_state * 16807 % 2147483647;
-        u = float(rand_state) / 2147483647.f;
-        rand_state = rand_state * 16807 % 2147483647;
-        t = t_min + float(rand_state) / 2147483647.f;
+        // rand_state = rand_state * 16807 % 2147483647;
+        // v = 20.f * float(rand_state) / 2147483647.f - 10.f;
+        // rand_state = rand_state * 16807 % 2147483647;
+        // u = float(rand_state) / 2147483647.f;
+        // rand_state = rand_state * 16807 % 2147483647;
+        // t = t_min + float(rand_state) / 2147483647.f;
 
         int count = 0;
         while (count++ < iterate_limit && 0.f <= u && u <= 1.f && t >= t_min) {

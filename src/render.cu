@@ -15,7 +15,7 @@ __global__ void render(Image *image, Scene **p_scene) {
 
     int pixel_index = y * width + x;
 
-    RandState local_rand_state = 1;
+    RandState local_rand_state;
     // Each thread gets same seed, a different sequence number, no offset
     // curand_init(rand_seed, pixel_index, 0, &local_rand_state);
 
@@ -25,10 +25,6 @@ __global__ void render(Image *image, Scene **p_scene) {
     Ray ray = camera->generateRay(Vector2f(x, y));
     Hit hit;
     // 判断ray是否和场景有交点，并返回最近交点的数据，存储在hit中
-
-    if (x == 169 && y == 273) {
-        x = 169;
-    }
     bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, local_rand_state);
 
     Vector3f finalColor;
@@ -110,9 +106,7 @@ __global__ void render(Image *image, Scene **p_scene) {
                                exit_refractive_index);
             }
 
-            if (q_top == 0) {
-                break;
-            }
+            hasIntersection = false;
             while (q_top > 0) {
                 hit.clear();
                 q_top--;

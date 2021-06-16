@@ -15,36 +15,36 @@ __device__ BezierCurve::BezierCurve(Vector3f *points, int num_controls)
 __device__ BezierCurve::~BezierCurve() {}
 
 __device__ CurvePoint BezierCurve::curve_point_at_t(float t) {
-    float **B = new float *[num_controls];
-    for (int i = 0; i < num_controls; i++) {
-        B[i] = new float[i + 1];
-    };
+    __shared__ extern float shared[];
+
+    int thread_id = threadIdx.x * blockDim.y + threadIdx.y;
+    float *B = &shared[thread_id * (n + 2) * (n + 1) / 2];
 
     // calculate B[p][q] = B_{q, p}(t)
-    B[0][0] = 1.f;
+    // B[p][q] = B[p * (p + 1) / 2 + q]
+    B[0 * (0 + 1) / 2 + 0] = 1.f;
     for (int p = 1; p <= n; p++) {
-        B[p][0] = (1.f - t) * B[p - 1][0];
+        int offset_p = p * (p + 1) / 2;
+        int offset_p_1 = p * (p - 1) / 2;
+        B[offset_p + 0] = (1.f - t) * B[offset_p_1 + 0];
         for (int q = 1; q < p; q++) {
-            B[p][q] = t * B[p - 1][q - 1] + (1 - t) * B[p - 1][q];
+            B[offset_p + q] = t * B[offset_p_1 + q - 1] + (1 - t) * B[offset_p_1 + q];
         }
-        B[p][p] = t * B[p - 1][p - 1];
+        B[offset_p + p] = t * B[offset_p_1 + p - 1];
     }
 
     Vector3f V = Vector3f(0.f);
+    int offset_n = n * (n + 1) / 2;
     for (int j = 0; j <= n; j++) {
-        V += B[n][j] * controls[j];
+        V += B[offset_n + j] * controls[j];
     }
 
+    int offset_n_1 = n * (n - 1) / 2;
     Vector3f T = Vector3f(0.f);
     for (int j = 0; j < n; j++) {
-        T += B[n - 1][j] * (controls[j + 1] - controls[j]);
+        T += B[offset_n_1 + j] * (controls[j + 1] - controls[j]);
     }
     T *= n;
-
-    for (int i = 0; i <= n; i++) {
-        delete[] B[i];
-    }
-    delete[] B;
 
     return {V, T};
 }
