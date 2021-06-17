@@ -21,11 +21,7 @@ __device__ void DiskLight::getIllumination(const Vector3f &p, Vector3f &dir,
 }
 
 __device__ Vector2f DiskLight::random_unit_disk(RandState &random) {
-    while (true) {
-        float a = 2.f * curand_uniform(&random) - 1.f;
-        float b = 2.f * curand_uniform(&random) - 1.f;
-        if (a * a + b * b <= 1.f) {
-            return Vector2f(a, b);
-        }
-    }
+    float r = sqrt(curand_uniform(&random));
+    float theta = 2.f * M_PI * curand_uniform(&random);
+    return Vector2f(r * cos(theta), r * sin(theta));
 }

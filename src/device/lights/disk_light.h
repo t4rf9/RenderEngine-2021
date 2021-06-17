@@ -8,7 +8,7 @@ class DiskLight : public PointLight {
 public:
     __device__ DiskLight() = delete;
 
-    // normal should be an unit vector
+    // normal should be a unit vector
     __device__ DiskLight(const Vector3f &position, const Vector3f &color,
                          const Vector3f &normal, const float radius, Type type = DISK);
 

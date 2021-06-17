@@ -20,11 +20,7 @@ __device__ Ray PerspectiveCamera::generateRay(const Vector2f &point, RandState &
 }
 
 __device__ Vector2f PerspectiveCamera::random_unit_disk(RandState &random) {
-    while (true) {
-        float a = 2.f * curand_uniform(&random) - 1.f;
-        float b = 2.f * curand_uniform(&random) - 1.f;
-        if (a * a + b * b <= 1.f) {
-            return Vector2f(a, b);
-        }
-    }
+    float r = sqrt(curand_uniform(&random));
+    float theta = 2.f * M_PI * curand_uniform(&random);
+    return Vector2f(r * cos(theta), r * sin(theta));
 }
