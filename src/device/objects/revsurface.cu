@@ -1,4 +1,3 @@
-#include "device/random.h"
 #include "revsurface.h"
 #include <curand_kernel.h>
 
@@ -60,7 +59,8 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     bool res = false;
 
     for (int i = 0; i < repeat_limit; i++) {
-        Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
+        Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
+                   20.f * curand_uniform(&rand_state) - 10.f);
 
         auto &t = x[0];
         auto &u = x[1];
@@ -110,7 +110,8 @@ __device__ bool RevSurface::intersect(const Ray &ray, float t_min, float t_max,
     }
 
     for (int i = 0; i < repeat_limit; i++) {
-        Vector3f x(t_min + rand_state(), rand_state(), 20.f * rand_state() - 10.f);
+        Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
+                   20.f * curand_uniform(&rand_state) - 10.f);
 
         auto &t = x[0];
         auto &u = x[1];

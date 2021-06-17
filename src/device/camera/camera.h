@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <cmath>
 
+#include "define.h"
 #include "device/ray.h"
 
 #include "cuda_error.h"
@@ -17,7 +18,7 @@ public:
     __device__ virtual ~Camera();
 
     // Generate rays for each screen-space coordinate
-    __device__ virtual Ray generateRay(const Vector2f &point) = 0;
+    __device__ virtual Ray generateRay(const Vector2f &point, RandState &random) = 0;
 
     __host__ __device__ inline int getWidth() const { return width; }
 

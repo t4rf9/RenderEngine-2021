@@ -17,8 +17,8 @@ public:
      * @param p unsed in this function
      * @param distanceToLight not well defined because it's not a point light
      */
-    __device__ void getIllumination(const Vector3f &p, Vector3f &dir,
-                                    Vector3f &col) override;
+    __device__ void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col,
+                                    RandState &random) override;
 
 private:
     Vector3f direction;

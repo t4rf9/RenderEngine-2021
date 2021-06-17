@@ -4,7 +4,6 @@
 #include <utility>
 
 #include "camera.h"
-#include "device/random.h"
 
 class PerspectiveCamera : public Camera {
 public:
@@ -22,7 +21,10 @@ public:
                                  const Vector3f &up, int imgW, int imgH, float angle,
                                  float focus_dst = 1.f, float aperture = 0.f);
 
-    __device__ Ray generateRay(const Vector2f &point) override;
+    __device__ Ray generateRay(const Vector2f &point, RandState &random) override;
+
+private:
+    __device__ Vector2f random_unit_disk(RandState &random);
 
 protected:
     float angle;
@@ -33,6 +35,4 @@ protected:
 
     float f;
     Matrix3f R;
-
-    Random random;
 };

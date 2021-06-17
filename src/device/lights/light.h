@@ -2,7 +2,7 @@
 
 #include <Vector3f.h>
 
-#include "cuda_error.h"
+#include "define.h"
 
 class Light {
 public:
@@ -15,5 +15,5 @@ public:
     __device__ virtual ~Light();
 
     __device__ virtual void getIllumination(const Vector3f &p, Vector3f &dir,
-                                            Vector3f &col) = 0;
+                                            Vector3f &col, RandState &random) = 0;
 };

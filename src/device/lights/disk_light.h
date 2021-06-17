@@ -1,6 +1,5 @@
 #pragma once
 
-#include "device/random.h"
 #include "point_light.h"
 
 #include <vecmath.h>
@@ -16,11 +15,12 @@ public:
     __device__ ~DiskLight() override;
 
     __device__ virtual void getIllumination(const Vector3f &p, Vector3f &dir,
-                                            Vector3f &col) override;
+                                            Vector3f &col, RandState &random) override;
+
+private:
+    __device__ Vector2f random_unit_disk(RandState &random);
 
 private:
     Vector3f x;
     Vector3f y;
-
-    Random random;
 };

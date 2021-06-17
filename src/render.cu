@@ -17,15 +17,17 @@ __global__ void render(Image *image, Scene **p_scene) {
 
     RandState local_rand_state;
     // Each thread gets same seed, a different sequence number, no offset
-    // curand_init(rand_seed, pixel_index, 0, &local_rand_state);
+    curand_init(rand_seed, pixel_index, 0, &local_rand_state);
 
     Group *baseGroup = scene->getGroup();
 
     Vector3f finalColor;
     for (int i = 0; i < rays_per_pixel; i++) {
         // 计算当前像素(x,y)处相机出射光线ray
-        Ray ray = camera->generateRay(
-            Vector2f((x - 0.5) + local_rand_state(), (y - 0.5) + local_rand_state()));
+        Ray ray =
+            camera->generateRay(Vector2f((x - 0.5) + curand_uniform(&local_rand_state),
+                                         (y - 0.5) + curand_uniform(&local_rand_state)),
+                                local_rand_state);
         Hit hit;
         // 判断ray是否和场景有交点，并返回最近交点的数据，存储在hit中
         bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, local_rand_state);
@@ -66,11 +68,13 @@ __global__ void render(Image *image, Scene **p_scene) {
                     Light *light = scene->getLight(li);
                     Vector3f L, lightColor;
                     // 获得光照强度
-                    int shadow_check_time =
-                        shadow && light->type == Light::DISK ? 10 : 1;
+                    int shadow_check_time = shadow && light->type == Light::DISK
+                                                ? disk_light_shadow_check
+                                                : 1;
                     Vector3f color_tmp;
                     for (int j = 0; j < shadow_check_time; j++) {
-                        light->getIllumination(intersection, L, lightColor);
+                        light->getIllumination(intersection, L, lightColor,
+                                               local_rand_state);
                         float len = L.normalize();
                         // shadow
                         bool shadowed =

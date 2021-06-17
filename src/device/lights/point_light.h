@@ -14,7 +14,7 @@ public:
     __device__ ~PointLight() override;
 
     __device__ virtual void getIllumination(const Vector3f &p, Vector3f &dir,
-                                            Vector3f &col) override;
+                                            Vector3f &col, RandState &random) override;
 
 protected:
     Vector3f position;

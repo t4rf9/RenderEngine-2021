@@ -42,8 +42,6 @@ ADD_EXECUTABLE(main
         src/device/hit.h src/device/hit.cu
         src/device/ray.h src/device/ray.cu
 
-        src/device/random.cu src/device/random.h
-
         src/scene/scene_parser.h src/scene/scene_parser.cu
         src/scene/scene.h src/scene/scene.cu
         
@@ -102,8 +100,6 @@ ADD_EXECUTABLE(test
         src/device/objects/BoundingObject.h src/device/objects/BoundingObject.cu
         src/device/hit.h src/device/hit.cu
         src/device/ray.h src/device/ray.cu
-
-        src/device/random.cu src/device/random.h
 
         src/scene/scene_parser.h src/scene/scene_parser.cu
         src/scene/scene.h src/scene/scene.cu
