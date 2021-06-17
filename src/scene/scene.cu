@@ -7,7 +7,8 @@ __device__ Scene::Scene(CameraParams *camera_params, LightsParams *lights_params
       base_group_params(base_group_params) {
     camera = new PerspectiveCamera(camera_params->pos, camera_params->direction,
                                    camera_params->up, camera_params->width,
-                                   camera_params->height, camera_params->angle);
+                                   camera_params->height, camera_params->angle,
+                                   camera_params->focus_dist, camera_params->aperture);
 
     num_lights = lights_params->num_lights;
     lights = new Light *[num_lights];

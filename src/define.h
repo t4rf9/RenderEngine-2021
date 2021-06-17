@@ -10,6 +10,8 @@ const bool shadow = true;
 const bool reflect = true;
 const bool refract = true;
 
+const int rays_per_pixel = 500;
+
 // typedef curandStateMRG32k3a RandState;
 // typedef curandStatePhilox4_32_10_t RandState;
 // typedef curandStateSobol32_t RandState;

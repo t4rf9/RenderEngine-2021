@@ -12,4 +12,7 @@ struct CameraParams {
     int width;
     int height;
     float angle;
+
+    float focus_dist;
+    float aperture;
 };

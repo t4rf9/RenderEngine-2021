@@ -15,6 +15,7 @@
 
 #include "cuda_error.h"
 
+#include "define.h"
 #include "scene/parameters/parameters.h"
 
 #define MAX_PARSER_TOKEN_LENGTH 1024

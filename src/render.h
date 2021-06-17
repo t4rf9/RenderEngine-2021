@@ -15,6 +15,4 @@
 #include "image.h"
 #include "scene/scene.h"
 
-#include <curand_kernel.h>
-
 __global__ void render(Image *image, Scene **p_scene);

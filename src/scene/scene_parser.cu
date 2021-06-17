@@ -11,8 +11,6 @@
 
 #define DegreesToRadians(x) (M_PI * (x) / 180.0f)
 
-const bool debug = true;
-
 SceneParser::SceneParser(const char *filename) {
     // initialize some reasonable default values
 
@@ -102,39 +100,45 @@ void SceneParser::parseFile() {
 // ====================================================================
 
 void SceneParser::parsePerspectiveCamera() {
-    printf("SceneParser::parsePerspectiveCamera()\n");
+    if (debug)
+        printf("SceneParser::parsePerspectiveCamera()\n");
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the camera parameters
     getToken(token);
     assert(!strcmp(token, "{"));
 
-    getToken(token);
-    assert(!strcmp(token, "center"));
-    camera_params->pos = readVector3f();
+    camera_params->pos = Vector3f::ZERO;
+    camera_params->direction = Vector3f::FORWARD;
+    camera_params->up = Vector3f::UP;
+    camera_params->angle = DegreesToRadians(60.f);
+    camera_params->width = 100;
+    camera_params->height = 100;
+    camera_params->focus_dist = 1.f;
+    camera_params->aperture = 0.f;
 
-    getToken(token);
-    assert(!strcmp(token, "direction"));
-    camera_params->direction = readVector3f();
-
-    getToken(token);
-    assert(!strcmp(token, "up"));
-    camera_params->up = readVector3f();
-
-    getToken(token);
-    assert(!strcmp(token, "angle"));
-    float angle_degrees = readFloat();
-    camera_params->angle = DegreesToRadians(angle_degrees);
-
-    getToken(token);
-    assert(!strcmp(token, "width"));
-    camera_params->width = readInt();
-
-    getToken(token);
-    assert(!strcmp(token, "height"));
-    camera_params->height = readInt();
-
-    getToken(token);
-    assert(!strcmp(token, "}"));
+    while (true) {
+        getToken(token);
+        if (!strcmp(token, "}")) {
+            break;
+        } else if (!strcmp(token, "center")) {
+            camera_params->pos = readVector3f();
+        } else if (!strcmp(token, "direction")) {
+            camera_params->direction = readVector3f();
+        } else if (!strcmp(token, "up")) {
+            camera_params->up = readVector3f();
+        } else if (!strcmp(token, "angle")) {
+            float angle_degrees = readFloat();
+            camera_params->angle = DegreesToRadians(angle_degrees);
+        } else if (!strcmp(token, "width")) {
+            camera_params->width = readInt();
+        } else if (!strcmp(token, "height")) {
+            camera_params->height = readInt();
+        } else if (!strcmp(token, "focus_dist")) {
+            camera_params->focus_dist = readFloat();
+        } else if (!strcmp(token, "aperture")) {
+            camera_params->aperture = readFloat();
+        }
+    }
 
     camera_params->type = CameraParams::Type::PerspectiveCamera;
 }

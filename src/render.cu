@@ -22,8 +22,7 @@ __global__ void render(Image *image, Scene **p_scene) {
     Group *baseGroup = scene->getGroup();
 
     Vector3f finalColor;
-    const int sample_time = 10;
-    for (int i = 0; i < sample_time; i++) {
+    for (int i = 0; i < rays_per_pixel; i++) {
         // 计算当前像素(x,y)处相机出射光线ray
         Ray ray = camera->generateRay(
             Vector2f((x - 0.5) + local_rand_state(), (y - 0.5) + local_rand_state()));
@@ -131,5 +130,5 @@ __global__ void render(Image *image, Scene **p_scene) {
         }
     }
 
-    image->SetPixel(x, y, finalColor / sample_time);
+    image->SetPixel(x, y, finalColor / rays_per_pixel);
 }
