@@ -3,7 +3,7 @@
 #include <vecmath.h>
 
 struct LightParams {
-    enum Type { Directional, Point } type;
+    enum Type { DIRECRIONAL, POINT, DISK } type;
 
     union {
         Vector3f position;
@@ -11,4 +11,6 @@ struct LightParams {
     };
 
     Vector3f color;
+    float radius;
+    Vector3f normal;
 };

@@ -49,6 +49,7 @@ private:
     void parseLights();
     void parsePointLight(LightParams *light_param);
     void parseDirectionalLight(LightParams *light_param);
+    void parseDiskLight(LightParams *light_param);
 
     void parseMaterials();
     void parsePhongMaterial(MaterialParams *material_params);

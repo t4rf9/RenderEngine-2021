@@ -17,12 +17,16 @@ ADD_EXECUTABLE(main
         src/device/camera/camera.h src/device/camera/camera.cu
         src/device/camera/perspective_camera.cu src/device/camera/perspective_camera.h
         src/device/camera/cameras.h
-        src/device/objects/group.h src/device/objects/group.cu
+
         src/device/lights/lights.h
         src/device/lights/light.h src/device/lights/light.cu
         src/device/lights/directional_light.h src/device/lights/directional_light.cu
         src/device/lights/point_light.h src/device/lights/point_light.cu
+        src/device/lights/disk_light.h src/device/lights/disk_light.cu
+
         src/device/material.h src/device/material.cu
+
+        src/device/objects/group.h src/device/objects/group.cu
         src/device/objects/mesh.h src/device/objects/mesh.cu
         src/device/objects/object3d.h src/device/objects/object3d.cu
         src/device/objects/plane.h src/device/objects/plane.cu
@@ -74,12 +78,16 @@ ADD_EXECUTABLE(test
         src/device/camera/camera.h src/device/camera/camera.cu
         src/device/camera/perspective_camera.cu src/device/camera/perspective_camera.h
         src/device/camera/cameras.h
-        src/device/objects/group.h src/device/objects/group.cu
+
         src/device/lights/lights.h
         src/device/lights/light.h src/device/lights/light.cu
         src/device/lights/directional_light.h src/device/lights/directional_light.cu
         src/device/lights/point_light.h src/device/lights/point_light.cu
+        src/device/lights/disk_light.h src/device/lights/disk_light.cu
+
         src/device/material.h src/device/material.cu
+
+        src/device/objects/group.h src/device/objects/group.cu
         src/device/objects/mesh.h src/device/objects/mesh.cu
         src/device/objects/object3d.h src/device/objects/object3d.cu
         src/device/objects/plane.h src/device/objects/plane.cu

@@ -6,10 +6,14 @@
 
 class Light {
 public:
-    __device__ Light();
+    enum Type { POINT, DISK, DIRECTIONAL } type;
+
+    __device__ Light() = delete;
+
+    __device__ Light(Type type);
 
     __device__ virtual ~Light();
 
     __device__ virtual void getIllumination(const Vector3f &p, Vector3f &dir,
-                                            Vector3f &col) const = 0;
+                                            Vector3f &col) = 0;
 };

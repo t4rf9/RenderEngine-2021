@@ -24,11 +24,6 @@ public:
 
     __device__ Ray generateRay(const Vector2f &point) override;
 
-private:
-    __device__ Vector2f random_unit_circle();
-
-    Random random;
-
 protected:
     float angle;
     Vector2f center;
@@ -38,4 +33,6 @@ protected:
 
     float f;
     Matrix3f R;
+
+    Random random;
 };

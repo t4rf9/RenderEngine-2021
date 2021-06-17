@@ -66,17 +66,23 @@ __global__ void render(Image *image, Scene **p_scene) {
                     Light *light = scene->getLight(li);
                     Vector3f L, lightColor;
                     // 获得光照强度
-                    light->getIllumination(intersection, L, lightColor);
-                    float len = L.normalize();
-                    // shadow
-                    bool shadowed =
-                        shadow && baseGroup->intersect(
-                                      Ray(intersection + 1e-2f * L, L, 0, 1.f, 1.f), 0.f,
-                                      len, local_rand_state);
-                    if (!shadowed) {
-                        // 计算局部光强
-                        color += material->Shade(ray, hit, L, lightColor);
+                    int shadow_check_time =
+                        shadow && light->type == Light::DISK ? 10 : 1;
+                    Vector3f color_tmp;
+                    for (int j = 0; j < shadow_check_time; j++) {
+                        light->getIllumination(intersection, L, lightColor);
+                        float len = L.normalize();
+                        // shadow
+                        bool shadowed =
+                            shadow && baseGroup->intersect(
+                                          Ray(intersection + 1e-2f * L, L, 0, 1.f, 1.f),
+                                          0.f, len, local_rand_state);
+                        if (!shadowed) {
+                            // 计算局部光强
+                            color_tmp += material->Shade(ray, hit, L, lightColor);
+                        }
                     }
+                    color += color_tmp / shadow_check_time;
                 }
                 color *= weight;
                 finalColor += color;

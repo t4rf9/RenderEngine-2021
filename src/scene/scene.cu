@@ -15,12 +15,15 @@ __device__ Scene::Scene(CameraParams *camera_params, LightsParams *lights_params
     for (int i = 0; i < num_lights; i++) {
         LightParams &light_params = lights_params->lights[i];
         switch (light_params.type) {
-        case LightParams::Type::Point:
+        case LightParams::Type::POINT:
             lights[i] = new PointLight(light_params.position, light_params.color);
             break;
-        case LightParams::Type::Directional:
+        case LightParams::Type::DIRECRIONAL:
             lights[i] = new DirectionalLight(light_params.direction, light_params.color);
             break;
+        case LightParams::Type::DISK:
+            lights[i] = new DiskLight(light_params.position, light_params.color,
+                                      light_params.normal, light_params.radius);
         default:
             break;
         }

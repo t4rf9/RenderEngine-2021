@@ -192,6 +192,8 @@ void SceneParser::parseLights() {
             parseDirectionalLight(&lights_params->lights[count]);
         } else if (strcmp(token, "PointLight") == 0) {
             parsePointLight(&lights_params->lights[count]);
+        } else if (strcmp(token, "DiskLight") == 0) {
+            parseDiskLight(&lights_params->lights[count]);
         } else {
             printf("Unknown token in parseLight: '%s'\n", token);
             exit(0);
@@ -221,7 +223,7 @@ void SceneParser::parseDirectionalLight(LightParams *light_param) {
     getToken(token);
     assert(!strcmp(token, "}"));
 
-    light_param->type = LightParams::Type::Directional;
+    light_param->type = LightParams::Type::DIRECRIONAL;
 }
 
 void SceneParser::parsePointLight(LightParams *light_param) {
@@ -243,7 +245,38 @@ void SceneParser::parsePointLight(LightParams *light_param) {
     getToken(token);
     assert(!strcmp(token, "}"));
 
-    light_param->type = LightParams::Type::Point;
+    light_param->type = LightParams::Type::POINT;
+}
+
+void SceneParser::parseDiskLight(LightParams *light_param) {
+    if (debug)
+        printf("SceneParser::parseDiskLight()\n");
+    char token[MAX_PARSER_TOKEN_LENGTH];
+
+    light_param->position = Vector3f::ZERO;
+    light_param->color = Vector3f::ZERO;
+    light_param->radius = 0;
+    light_param->normal = Vector3f(0, -1, 0);
+
+    getToken(token);
+    assert(!strcmp(token, "{"));
+
+    while (true) {
+        getToken(token);
+        if (!strcmp(token, "}")) {
+            break;
+        } else if (!strcmp(token, "position")) {
+            light_param->position = readVector3f();
+        } else if (!strcmp(token, "color")) {
+            light_param->color = readVector3f();
+        } else if (!strcmp(token, "radius")) {
+            light_param->radius = readFloat();
+        } else if (!strcmp(token, "normal")) {
+            light_param->normal = readVector3f().normalized();
+        }
+    }
+
+    light_param->type = LightParams::Type::DISK;
 }
 // ====================================================================
 // ====================================================================
