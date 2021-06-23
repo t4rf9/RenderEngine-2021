@@ -2,6 +2,8 @@
 
 #include <vecmath.h>
 
+#include "image.h"
+
 struct MaterialParams {
     Vector3f diffuseColor;
     Vector3f specularColor;
@@ -9,4 +11,5 @@ struct MaterialParams {
     float reflect_coefficient;
     float refract_coefficient;
     float refractive_index;
+    Image *texture;
 };

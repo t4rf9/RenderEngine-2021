@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hit.h"
+#include "image.h"
 #include "ray.h"
 
 #include <cassert>
@@ -12,15 +13,23 @@
 
 class Material {
 public:
-    __device__ explicit Material(const Vector3f &d_color, const Vector3f &s_color,
-                                 float shininess, float reflect_coefficient,
-                                 float refract_coefficient, float refractive_index);
+    __device__ Material(const Vector3f &d_color, const Vector3f &s_color, float shininess,
+                        float reflect_coefficient, float refract_coefficient,
+                        float refractive_index);
+
+    __device__ explicit Material(Image *texture);
 
     __device__ ~Material();
 
     __device__ Vector3f getSpecularColor() const;
 
     __device__ Vector3f getDiffuseColor() const;
+
+    __device__ inline bool useTexture() const { return texture != nullptr; }
+
+    __device__ inline Vector3f getTextureColor(int x, int y) const {
+        return texture->GetPixel(x % texture->Width(), y % texture->Height());
+    }
 
     __device__ Vector3f Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight,
                               const Vector3f &lightColor);
@@ -49,4 +58,5 @@ protected:
     float reflect_coefficient;
     float refract_coefficient;
     float refractive_index;
+    Image *texture;
 };

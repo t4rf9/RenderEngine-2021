@@ -57,6 +57,11 @@ SceneParser::~SceneParser() {
     checkCudaErrors(cudaFree(lights_params->lights));
     checkCudaErrors(cudaFree(lights_params));
 
+    for (int i = 0; i < materials_params->num_materials; i++) {
+        if (materials_params->materials[i].texture != nullptr) {
+            delete materials_params->materials[i].texture;
+        }
+    }
     checkCudaErrors(cudaFree(materials_params->materials));
     checkCudaErrors(cudaFree(materials_params));
 
@@ -328,6 +333,7 @@ void SceneParser::parsePhongMaterial(MaterialParams *material_params) {
     material_params->reflect_coefficient = 0.f;
     material_params->refract_coefficient = 0.f;
     material_params->refractive_index = 1.f;
+    material_params->texture = nullptr;
 
     getToken(token);
     assert(!strcmp(token, "{"));
@@ -347,8 +353,13 @@ void SceneParser::parsePhongMaterial(MaterialParams *material_params) {
         } else if (strcmp(token, "refractiveIndex") == 0) {
             material_params->refractive_index = readFloat();
         } else if (strcmp(token, "texture") == 0) {
-            // Optional: read in texture and draw it.
+            // read in texture and draw it.
             getToken(filename);
+
+            const char *ext = &filename[strlen(filename) - 4];
+            assert(!strcmp(ext, ".ppm"));
+
+            material_params->texture = Image::LoadPPM(filename);
         } else {
             assert(!strcmp(token, "}"));
             break;
@@ -380,7 +391,7 @@ void SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH],
     } else if (!strcmp(token, "TriangleMesh")) {
         *object_type = ObjectType::MESH;
         checkCudaErrors(cudaMallocManaged(&object->mesh, sizeof(MeshParams)));
-        parseTriangleMesh(object->mesh);
+        parseMesh(object->mesh);
     } else if (!strcmp(token, "Transform")) {
         *object_type = ObjectType::TRANSFORM;
         checkCudaErrors(cudaMallocManaged(&object->transform, sizeof(TransformParams)));
@@ -493,16 +504,30 @@ void SceneParser::parsePlane(PlaneParams *plane_params) {
     getToken(token);
     assert(!strcmp(token, "{"));
 
-    getToken(token);
-    assert(!strcmp(token, "normal"));
-    plane_params->normal = readVector3f();
+    plane_params->normal = -Vector3f::FORWARD;
+    plane_params->d = 0.f;
+    plane_params->texture_origin = Vector3f::ZERO;
+    plane_params->texture_x = Vector3f::RIGHT;
+    plane_params->texture_y = Vector3f::UP;
 
-    getToken(token);
-    assert(!strcmp(token, "offset"));
-    plane_params->d = readFloat();
+    while (true) {
+        getToken(token);
 
-    getToken(token);
-    assert(!strcmp(token, "}"));
+        if (!strcmp(token, "normal")) {
+            plane_params->normal = readVector3f();
+        } else if (!strcmp(token, "offset")) {
+            plane_params->d = readFloat();
+        } else if (!strcmp(token, "texture_origin")) {
+            plane_params->texture_origin = readVector3f();
+        } else if (!strcmp(token, "texture_x")) {
+            plane_params->texture_x = readVector3f();
+        } else if (!strcmp(token, "texture_y")) {
+            plane_params->texture_y = readVector3f();
+        } else {
+            assert(!strcmp(token, "}"));
+            break;
+        }
+    }
 
     assert(current_material != -1);
     plane_params->material_id = current_material;
@@ -534,7 +559,7 @@ void SceneParser::parseTriangle(TriangleParams *triangle_params) {
     triangle_params->material_id = current_material;
 }
 
-void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
+void SceneParser::parseMesh(MeshParams *mesh_params) {
     if (debug)
         printf("SceneParser::parseMesh(0x%lx)\n", mesh_params);
     char token[MAX_PARSER_TOKEN_LENGTH];
@@ -570,8 +595,8 @@ void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
     std::string tok;
     int texID;
 
-    thrust::host_vector<Vector3f> v;
-    thrust::host_vector<dim3> t;
+    thrust::host_vector<Vector3f> vertices;
+    thrust::host_vector<dim3> triangles;
     while (true) {
         std::getline(f, line);
         if (f.eof()) {
@@ -588,7 +613,7 @@ void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
         if (tok == vTok) {
             Vector3f vec;
             ss >> vec[0] >> vec[1] >> vec[2];
-            v.push_back(vec);
+            vertices.push_back(vec);
         } else if (tok == fTok) {
             dim3 trig;
             if (line.find('/') != std::string::npos) {
@@ -606,7 +631,7 @@ void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
             trig.x -= 1;
             trig.y -= 1;
             trig.z -= 1;
-            t.push_back(trig);
+            triangles.push_back(trig);
         } else if (tok == texTok) {
             Vector2f texcoord;
             ss >> texcoord[0];
@@ -616,16 +641,39 @@ void SceneParser::parseTriangleMesh(MeshParams *mesh_params) {
 
     f.close();
 
-    mesh_params->num_vertices = v.size();
-    mesh_params->num_faces = t.size();
+    mesh_params->min = Vector3f(INFINITY, INFINITY, INFINITY);
+    mesh_params->max = Vector3f(-INFINITY, -INFINITY, -INFINITY);
+    int num_vertices = vertices.size();
+    for (int i = 0; i < num_vertices; i++) {
+        auto &v = vertices[i];
+        if (v[0] < mesh_params->min[0]) {
+            mesh_params->min[0] = v[0];
+        }
+        if (v[1] < mesh_params->min[1]) {
+            mesh_params->min[1] = v[1];
+        }
+        if (v[2] < mesh_params->min[2]) {
+            mesh_params->min[2] = v[2];
+        }
+        if (v[0] > mesh_params->max[0]) {
+            mesh_params->max[0] = v[0];
+        }
+        if (v[1] > mesh_params->max[1]) {
+            mesh_params->max[1] = v[1];
+        }
+        if (v[2] > mesh_params->max[2]) {
+            mesh_params->max[2] = v[2];
+        }
+    }
 
-    checkCudaErrors(cudaMallocManaged(&mesh_params->vertices,
-                                      mesh_params->num_vertices * sizeof(Vector3f)));
-    checkCudaErrors(cudaMallocManaged(&mesh_params->face_indices,
-                                      mesh_params->num_faces * sizeof(dim3)));
-
-    thrust::copy(v.begin(), v.end(), mesh_params->vertices);
-    thrust::copy(t.begin(), t.end(), mesh_params->face_indices);
+    mesh_params->num_triangles = triangles.size();
+    checkCudaErrors(cudaMallocManaged(&mesh_params->triangle_vertices,
+                                      3 * mesh_params->num_triangles * sizeof(Vector3f)));
+    for (int i = 0; i < mesh_params->num_triangles; i++) {
+        mesh_params->triangle_vertices[3 * i] = vertices[triangles[i].x];
+        mesh_params->triangle_vertices[3 * i + 1] = vertices[triangles[i].y];
+        mesh_params->triangle_vertices[3 * i + 2] = vertices[triangles[i].z];
+    }
 
     assert(current_material != -1);
     mesh_params->material_id = current_material;
@@ -837,8 +885,7 @@ void SceneParser::freeBaseGroupParams() {
             case ObjectType::MESH:
                 if (debug)
                     printf("MESH*:\t0x%lx\n", object.mesh);
-                checkCudaErrors(cudaFree(object.mesh->vertices));
-                checkCudaErrors(cudaFree(object.mesh->face_indices));
+                checkCudaErrors(cudaFree(object.mesh->triangle_vertices));
                 checkCudaErrors(cudaFree(object.mesh));
                 break;
             case ObjectType::REVSURFACE:
@@ -878,8 +925,7 @@ void SceneParser::freeBaseGroupParams() {
                 case ObjectType::MESH:
                     if (debug)
                         printf("Mesh*:\t0x%lx\n", transform->object.mesh);
-                    checkCudaErrors(cudaFree(transform->object.mesh->vertices));
-                    checkCudaErrors(cudaFree(transform->object.mesh->face_indices));
+                    checkCudaErrors(cudaFree(transform->object.mesh->triangle_vertices));
                     checkCudaErrors(cudaFree(transform->object.mesh));
                     break;
                 case ObjectType::REVSURFACE:

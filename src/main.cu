@@ -4,7 +4,7 @@
 #include "destroy_scene.h"
 #include "device/camera/cameras.h"
 #include "device/lights/lights.h"
-#include "device/objects/group.h"
+#include "device/spaces/group.h"
 #include "image.h"
 #include "render.h"
 #include "scene/scene.h"
@@ -56,13 +56,14 @@ int main(int argc, char *argv[]) {
     checkCudaErrors(cudaDeviceSetLimit(cudaLimitStackSize, 2048));
 
     // Create the scene on GPU.
-    printf("create_scene\n");
+    printf("create_scene:\t");
+    clock_t start = clock();
     create_scene<<<1, 1>>>(
         p_scene, camera_params, sceneParser->getLightsParams(),
         sceneParser->getBaseGroupParams(), sceneParser->getMaterialsParams(),
         sceneParser->getBackgroundColor(), sceneParser->getEnvironmentColor());
-    checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
+    printf("%lf s\n", double(clock() - start) / CLOCKS_PER_SEC);
 
     // Then loop over each pixel in the image, shooting a ray
     // through that pixel and finding its intersection with
@@ -72,16 +73,18 @@ int main(int argc, char *argv[]) {
     dim3 block_size(8, 8);
     dim3 num_blocks((width + block_size.x - 1) / block_size.x,
                     (height + block_size.y - 1) / block_size.y);
-    printf("render\n");
+    printf("render:\t\t");
+    start = clock();
     render<<<num_blocks, block_size, 49152>>>(image, p_scene);
-    checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
+    printf("%lf s\n", double(clock() - start) / CLOCKS_PER_SEC);
 
     // Delete the scene on GPU.
-    printf("destroy_scene\n");
+    printf("destroy_scene:\t");
+    start = clock();
     destroy_scene<<<1, 1>>>(p_scene);
-    checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
+    printf("%lf s\n", double(clock() - start) / CLOCKS_PER_SEC);
 
     // Free GPU only resources.
 

@@ -4,7 +4,7 @@
 #include "destroy_scene.h"
 #include "device/camera/cameras.h"
 #include "device/lights/lights.h"
-#include "device/objects/group.h"
+#include "device/spaces/group.h"
 #include "image.h"
 #include "render.h"
 #include "scene/scene.h"

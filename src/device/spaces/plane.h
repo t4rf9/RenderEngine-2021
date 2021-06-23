@@ -12,6 +12,10 @@ public:
 
     __device__ Plane(const Vector3f &normal, float d, Material *m);
 
+    __device__ Plane(const Vector3f &normal, float d, Material *m,
+                     const Vector3f &texture_origin, const Vector3f &texture_x,
+                     const Vector3f &texture_y);
+
     __device__ ~Plane() override;
 
     __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,
@@ -23,4 +27,7 @@ public:
 protected:
     Vector3f normal; // (a, b, c)
     float d;         // ax + by + cz + d = 0
+    Vector3f texture_origin;
+    Vector3f texture_x;
+    Vector3f texture_y;
 };

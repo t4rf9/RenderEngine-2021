@@ -45,11 +45,11 @@ public:
 
     static void operator delete[](void *ptr) { checkCudaErrors(cudaFree(ptr)); }
 
-    inline int Width() const { return width; }
+    __host__ __device__ inline int Width() const { return width; }
 
-    inline int Height() const { return height; }
+    __host__ __device__ inline int Height() const { return height; }
 
-    inline const Vector3f &GetPixel(int x, int y) const {
+    __host__ __device__ inline const Vector3f &GetPixel(int x, int y) const {
         assert(x >= 0 && x < width);
         assert(y >= 0 && y < height);
         return data[y * width + x];

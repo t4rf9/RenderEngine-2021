@@ -7,11 +7,6 @@ __device__ bool BoundingBox::intersect(const Ray &ray, float t_min) {
     const Vector3f &d = ray.getDirection();
     const Vector3f &o = ray.getOrigin();
 
-    /*
-    if (min <= o && o <= max) {
-        return true;
-    }
-    */
     float t;
 
     if (d[0] != 0) {

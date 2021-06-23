@@ -44,6 +44,10 @@ __device__ bool Sphere::intersect(const Ray &ray, Hit &hit, float t_min,
 __device__ bool Sphere::intersect(const Ray &ray, float t_min, float t_max,
                                   RandState &rand_state) {
     // origin lies anywhere
+    if (material->get_refract_coefficient() >= 0.9f) {
+        return false;
+    }
+
     Vector3f l = center - ray.getOrigin();
     bool inside = l.length() < radius;
     bool on = l.length() == radius;

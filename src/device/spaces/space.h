@@ -8,14 +8,10 @@
 #include "device/material.h"
 #include "device/ray.h"
 
-// Base class for all 3d entities.
-class Object3D {
+class Space {
 public:
-    __device__ Object3D();
-
-    __device__ virtual ~Object3D();
-
-    __device__ explicit Object3D(Material *material);
+    __device__ Space();
+    __device__ virtual ~Space();
 
     // Intersect Ray with this object. If hit, store information in hit structure.
     __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,
@@ -23,7 +19,4 @@ public:
 
     __device__ virtual bool intersect(const Ray &ray, float t_min, float t_max,
                                       RandState &rand_state) = 0;
-
-protected:
-    Material *material;
 };

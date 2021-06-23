@@ -8,8 +8,8 @@
 
 class Mesh : public Object3D {
 public:
-    __device__ Mesh(Vector3f *vertices, int num_vertices, dim3 *face_indices,
-                    int num_faces, Material *material);
+    __device__ Mesh(Vector3f *triangle_vertices, int num_triangles, Vector3f min,
+                    Vector3f max, Material *material);
 
     __device__ ~Mesh();
 
@@ -20,10 +20,8 @@ public:
                                       RandState &rand_state) override;
 
 private:
-    int num_vertices;
-    int num_faces;
-    Vector3f *vertices;
-    Triangle **faces;
+    int num_triangles;
+    Triangle **triangles;
 
     BoundingBox *pBox;
 };

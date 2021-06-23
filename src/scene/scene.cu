@@ -33,10 +33,14 @@ __device__ Scene::Scene(CameraParams *camera_params, LightsParams *lights_params
     materials = new Material *[num_materials];
     for (int i = 0; i < num_materials; i++) {
         MaterialParams &material_params = materials_params->materials[i];
-        materials[i] = new Material(
-            material_params.diffuseColor, material_params.specularColor,
-            material_params.shininess, material_params.reflect_coefficient,
-            material_params.refract_coefficient, material_params.refractive_index);
+        if (material_params.texture != nullptr) {
+            materials[i] = new Material(material_params.texture);
+        } else {
+            materials[i] = new Material(
+                material_params.diffuseColor, material_params.specularColor,
+                material_params.shininess, material_params.reflect_coefficient,
+                material_params.refract_coefficient, material_params.refractive_index);
+        }
     }
 
     base_group = new Group(base_group_params->num_objects);
@@ -71,15 +75,24 @@ __device__ Scene::Scene(CameraParams *camera_params, LightsParams *lights_params
                     new Sphere(object_params.sphere->center, object_params.sphere->radius,
                                materials[object_params.sphere->material_id]);
                 break;
-            case ObjectType::PLANE:
-                object = new Plane(object_params.plane->normal, object_params.plane->d,
-                                   materials[object_params.plane->material_id]);
+            case ObjectType::PLANE: {
+                Material *material = materials[object_params.plane->material_id];
+                if (material->useTexture()) {
+                    object = new Plane(
+                        object_params.plane->normal, object_params.plane->d, material,
+                        object_params.plane->texture_origin,
+                        object_params.plane->texture_x, object_params.plane->texture_y);
+                } else {
+                    object = new Plane(object_params.plane->normal,
+                                       object_params.plane->d, material);
+                }
                 break;
+            }
             case ObjectType::MESH:
-                object = new Mesh(
-                    object_params.mesh->vertices, object_params.mesh->num_vertices,
-                    object_params.mesh->face_indices, object_params.mesh->num_faces,
-                    materials[object_params.mesh->material_id]);
+                object = new Mesh(object_params.mesh->triangle_vertices,
+                                  object_params.mesh->num_triangles,
+                                  object_params.mesh->min, object_params.mesh->max,
+                                  materials[object_params.mesh->material_id]);
                 break;
             case ObjectType::REVSURFACE:
                 Curve *pCurve;
@@ -144,18 +157,29 @@ __device__ Scene::Scene(CameraParams *camera_params, LightsParams *lights_params
                         transformed_object_params.sphere->radius,
                         materials[transformed_object_params.sphere->material_id]);
                     break;
-                case ObjectType::PLANE:
-                    transformed_object = new Plane(
-                        transformed_object_params.plane->normal,
-                        transformed_object_params.plane->d,
-                        materials[transformed_object_params.plane->material_id]);
+                case ObjectType::PLANE: {
+                    Material *material =
+                        materials[transformed_object_params.plane->material_id];
+                    if (material->useTexture()) {
+                        transformed_object =
+                            new Plane(transformed_object_params.plane->normal,
+                                      transformed_object_params.plane->d, material,
+                                      transformed_object_params.plane->texture_origin,
+                                      transformed_object_params.plane->texture_x,
+                                      transformed_object_params.plane->texture_y);
+                    } else {
+                        transformed_object =
+                            new Plane(transformed_object_params.plane->normal,
+                                      transformed_object_params.plane->d, material);
+                    }
                     break;
+                }
                 case ObjectType::MESH:
                     transformed_object =
-                        new Mesh(transformed_object_params.mesh->vertices,
-                                 transformed_object_params.mesh->num_vertices,
-                                 transformed_object_params.mesh->face_indices,
-                                 transformed_object_params.mesh->num_faces,
+                        new Mesh(transformed_object_params.mesh->triangle_vertices,
+                                 transformed_object_params.mesh->num_triangles,
+                                 transformed_object_params.mesh->min,
+                                 transformed_object_params.mesh->max,
                                  materials[transformed_object_params.mesh->material_id]);
                     break;
                 case ObjectType::REVSURFACE: {

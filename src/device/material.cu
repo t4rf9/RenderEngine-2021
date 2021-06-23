@@ -5,7 +5,9 @@ __device__ Material::Material(const Vector3f &d_color, const Vector3f &s_color,
                               float refract_coefficient, float refractive_index)
     : diffuseColor(d_color), specularColor(s_color), shininess(shininess),
       reflect_coefficient(reflect_coefficient), refract_coefficient(refract_coefficient),
-      refractive_index(refractive_index) {}
+      refractive_index(refractive_index), texture(nullptr) {}
+
+__device__ Material::Material(Image *texture) : texture(texture) {}
 
 __device__ Material::~Material() {}
 

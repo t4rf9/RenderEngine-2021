@@ -33,8 +33,10 @@ __global__ void render(Image *image, Scene **p_scene) {
         bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, local_rand_state);
 
         if (hasIntersection) {
-            finalColor +=
-                scene->getEnvironmentColor() * hit.getMaterial()->getDiffuseColor();
+            auto *material = hit.getMaterial();
+            if (material != nullptr) {
+                finalColor += scene->getEnvironmentColor() * material->getDiffuseColor();
+            }
 
             const int refract_depth_limit = 5;
             const int reflect_depth_limit = 5;
@@ -52,7 +54,8 @@ __global__ void render(Image *image, Scene **p_scene) {
                 auto weight = ray.get_weight();
                 auto incident_direction = ray.getDirection();
                 auto incident_refractive_index = ray.get_incident_refractive_index();
-                auto exit_refractive_index = material->get_refractive_index();
+                auto exit_refractive_index =
+                    material != nullptr ? material->get_refractive_index() : 0.f;
                 Vector3f &normal = hit.getNormal_var();
                 float cos_in = -Vector3f::dot(incident_direction, normal);
                 if (cos_in < 0.f) {
@@ -83,7 +86,9 @@ __global__ void render(Image *image, Scene **p_scene) {
                                           0.f, len, local_rand_state);
                         if (!shadowed) {
                             // 计算局部光强
-                            color_tmp += material->Shade(ray, hit, L, lightColor);
+                            color_tmp += material != nullptr
+                                             ? material->Shade(ray, hit, L, lightColor)
+                                             : hit.getColor();
                         }
                     }
                     color += color_tmp / shadow_check_time;
@@ -92,8 +97,8 @@ __global__ void render(Image *image, Scene **p_scene) {
                 finalColor += color;
 
                 // reflect
-                if (reflect && material->reflective() && depth < reflect_depth_limit &&
-                    weight > 1e-2f) {
+                if (reflect && material != nullptr && material->reflective() &&
+                    depth < reflect_depth_limit && weight > 1e-2f) {
                     Vector3f reflect_direction =
                         2.f * cos_in * normal + incident_direction;
                     Q[q_top++].set(intersection + 1e-3f * reflect_direction,
@@ -103,8 +108,8 @@ __global__ void render(Image *image, Scene **p_scene) {
                 }
 
                 // refract
-                if (refract && material->refractive() && depth < refract_depth_limit &&
-                    weight > 1e-2f) {
+                if (refract && material != nullptr && material->refractive() &&
+                    depth < refract_depth_limit && weight > 1e-2f) {
                     float refractive_index =
                         incident_refractive_index / exit_refractive_index;
                     float cos_out = sqrt(1.f - refractive_index * refractive_index *

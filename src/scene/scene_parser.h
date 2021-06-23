@@ -17,6 +17,7 @@
 
 #include "define.h"
 #include "scene/parameters/parameters.h"
+#include "image.h"
 
 #define MAX_PARSER_TOKEN_LENGTH 1024
 
@@ -60,7 +61,7 @@ private:
     void parseSphere(SphereParams *sphere_params);
     void parsePlane(PlaneParams *plane_params);
     void parseTriangle(TriangleParams *triangle_params);
-    void parseTriangleMesh(MeshParams *mesh_params);
+    void parseMesh(MeshParams *mesh_params);
     void parseTransform(TransformParams *transform_params);
     void parseBezierCurve(CurveParams *curve_params);
     void parseBsplineCurve(CurveParams *curve_params);

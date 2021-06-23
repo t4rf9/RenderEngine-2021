@@ -163,8 +163,8 @@ Image *Image::LoadPPM(const char *filename) {
     char tmp[100];
     fgets(tmp, 100, file);
     assert(strstr(tmp, "P6"));
-    fgets(tmp, 100, file);
-    assert(tmp[0] == '#');
+    //fgets(tmp, 100, file);
+    //assert(tmp[0] == '#');
     fgets(tmp, 100, file);
     sscanf(tmp, "%d %d", &width, &height);
     fgets(tmp, 100, file);
