@@ -22,13 +22,15 @@ public:
 
     __device__ inline float getT() const { return t; }
 
-    __device__ inline void clear() { t = 1e38f; }
+    __device__ inline void clear() { t = INFINITY; }
 
     __device__ inline Material *getMaterial() const { return material; }
 
     __device__ inline const Vector3f &getNormal() const { return normal; }
 
     __device__ inline const Vector3f &getColor() const { return color; }
+
+    __device__ inline const Vector3f &getRevParams() const { return rev_params; }
 
     __device__ inline Vector3f &getNormal_var() { return normal; }
 
@@ -44,12 +46,20 @@ public:
         color = _color;
     }
 
+    __device__ inline void set(float t, float u, float v) {
+        rev_params[0] = t;
+        rev_params[1] = u;
+        rev_params[2] = v;
+        material = nullptr;
+    }
+
 private:
     float t;
     Material *material;
     union {
         Vector3f normal;
         Vector3f color;
+        Vector3f rev_params;
     };
 };
 /*

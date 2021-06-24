@@ -12,6 +12,8 @@ public:
 
     __device__ bool intersect(const Ray &ray, float t_min) override;
 
+    __device__ bool intersect(const Ray &ray, float t_min, float t_max) override;
+
     __device__ inline const Vector3f &get_min() { return min; }
 
     __device__ inline const Vector3f &get_max() { return max; }

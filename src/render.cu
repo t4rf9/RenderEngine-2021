@@ -24,12 +24,15 @@ __global__ void render(Image *image, Scene **p_scene) {
     Vector3f finalColor;
     for (int i = 0; i < rays_per_pixel; i++) {
         // 计算当前像素(x,y)处相机出射光线ray
-        Ray ray =
-            camera->generateRay(Vector2f((x - 0.5) + curand_uniform(&local_rand_state),
-                                         (y - 0.5) + curand_uniform(&local_rand_state)),
-                                local_rand_state);
+        Ray ray = camera->generateRay(
+            Vector2f((float(x) - 0.5f) + curand_uniform(&local_rand_state),
+                     (float(y) - 0.5f) + curand_uniform(&local_rand_state)),
+            local_rand_state);
         Hit hit;
         // 判断ray是否和场景有交点，并返回最近交点的数据，存储在hit中
+        if (x == 200 && y == 110) {
+            x = 200;
+        }
         bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, local_rand_state);
 
         if (hasIntersection) {

@@ -3,71 +3,131 @@
 
 __device__ RevSurface::RevSurface(Curve *pCurve, Material *material)
     : Object3D(material), pCurve(pCurve) {
+    /*
     auto *curve_box = pCurve->get_bounding_box();
-    if (curve_box != nullptr) {
-        const auto &curve_min = curve_box->get_min();
-        const auto &curve_max = curve_box->get_max();
-
-        // Check flat.
-        /*
-        if (curve_min.z() != 0 || curve_max.z() != 0) {
-            printf("Profile of revSurface must be flat on xy plane.\n");
-            exit(0);
-        }
-        */
-
-        Vector3f max = curve_max;
-        if (max.x() < -curve_min.x()) {
-            max.x() = -curve_min.x();
-        }
-        max.z() = max.x();
-
-        Vector3f min = Vector3f(-max.x(), curve_min.y(), -max.z());
-
-        pBound = new BoundingBox(min, max);
-    } else {
-        // Check flat.
-        /*
-        if (!pCurve->IsFlat()) {
-            printf("Profile of revSurface must be flat on xy plane.\n");
-            exit(0);
-        }
-        */
+    const auto &curve_min = curve_box->get_min();
+    const auto &curve_max = curve_box->get_max();
+    Vector3f max = curve_max;
+    if (max.x() < -curve_min.x()) {
+        max.x() = -curve_min.x();
     }
+    max.z() = max.x();
+    Vector3f min = Vector3f(-max.x(), curve_min.y(), -max.z());
+    pBound = new BoundingBox(min, max);
+    */
+
+    Vector3f *curve_points;
+    int num_curve_points = pCurve->discretize(curve_resolution, &curve_points);
+
+    int num_triangles = (angle_steps * 2) * (num_curve_points - 1);
+    Vector3f *triangle_points = new Vector3f[3 * num_triangles];
+    int i_tp = 0;
+
+    Vector3f *lower = new Vector3f[angle_steps];
+    Vector3f *higher = new Vector3f[angle_steps];
+
+    lower[0] = curve_points[0];
+    lower[0].x() = fabs(lower[0].x());
+    Vector3f min = lower[0];
+    Vector3f max = lower[0];
+    for (int i = 1; i < angle_steps; i++) {
+        float t = (float)i * angle_step;
+        Quat4f rot;
+        rot.setAxisAngle(t, Vector3f(0, 1, 0));
+        lower[i] = Matrix3f::rotation(rot) * lower[0];
+    }
+    for (int ci = 1; ci < num_curve_points; ++ci) {
+        // rotate
+        float t = 0.f;
+        higher[0] = curve_points[ci];
+        higher[0].x() = fabs(higher[0].x());
+
+        if (max.x() < higher[0].x()) {
+            max.x() = higher[0].x();
+        }
+        if (max.y() < higher[0].y()) {
+            max.y() = higher[0].y();
+        }
+        if (min.y() > higher[0].y()) {
+            min.y() = higher[0].y();
+        }
+
+        triangle_points[i_tp++] = higher[0];
+        triangle_points[i_tp++] = lower[1];
+        triangle_points[i_tp++] = lower[0];
+        for (int i = 1; i < angle_steps; ++i) {
+            float t = (float)i * angle_step;
+            Quat4f rot;
+            rot.setAxisAngle(t, Vector3f(0.f, -1.f, 0.f));
+            higher[i] = Matrix3f::rotation(rot) * higher[0];
+
+            // the next point with the same height
+            int i1 = (i + 1 == angle_steps) ? 0 : i + 1;
+
+            triangle_points[i_tp++] = higher[i];
+            triangle_points[i_tp++] = lower[i];
+            triangle_points[i_tp++] = higher[i - 1];
+
+            triangle_points[i_tp++] = higher[i];
+            triangle_points[i_tp++] = lower[i1];
+            triangle_points[i_tp++] = lower[i];
+        }
+
+        triangle_points[i_tp++] = higher[0];
+        triangle_points[i_tp++] = lower[0];
+        triangle_points[i_tp++] = higher[angle_steps - 1];
+
+        Vector3f *tmp = lower;
+        lower = higher;
+        higher = tmp;
+    }
+    delete[] lower;
+    delete[] higher;
+    delete[] curve_points;
+
+    max.z() = max.x();
+    min.x() = -max.x();
+    min.z() = min.x();
+
+    float curve_step = 1.f / num_curve_points;
+    pMesh = new Mesh(triangle_points, num_triangles, min, max, material, curve_step);
+    delete[] triangle_points;
 }
 
 __device__ RevSurface::~RevSurface() {
     delete pCurve;
-    delete pBound;
+    // delete pBound;
+    delete pMesh;
 }
-
-__device__ const int repeat_limit = 800;
-__device__ const int iterate_limit = 200;
 
 __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
                                       RandState &rand_state) {
+    // return pMesh->intersect(ray, hit, t_min, rand_state);
     // PA3 optional: implement this for the ray-tracing routine using G-N
     // iteration.
     Vector3f d = ray.getDirection();
     Vector3f o = ray.getOrigin();
 
-    // first check intersection with bounding object
-    if (!pBound->intersect(ray, t_min)) {
+    // first check intersection with mesh
+    Hit mesh_hit;
+    if (!pMesh->intersect_rev(ray, mesh_hit, t_min, rand_state)) {
         return false;
     }
 
-    bool res = false;
+    Vector3f init_values = mesh_hit.getRevParams();
 
+    bool res = false;
     for (int i = 0; i < repeat_limit; i++) {
-        Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
-                   20.f * curand_uniform(&rand_state) - 10.f);
+        // Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
+        //           20.f * curand_uniform(&rand_state) - 10.f);
+        Vector3f x(init_values[0], init_values[1], init_values[2]);
 
         auto &t = x[0];
         auto &u = x[1];
         auto &v = x[2];
 
         int count = 0;
-        while (count++ < iterate_limit && 0.f <= u && u <= 1.f && t >= t_min) {
+        while (count++ < iterate_limit && -10.f <= u && u <= 11.f && t >= t_min) {
             float v2 = v * v;
             float divisor = 1.f + v2;
             float sinv = 2.f * v / divisor;
@@ -105,9 +165,7 @@ __device__ bool RevSurface::intersect(const Ray &ray, float t_min, float t_max,
     Vector3f o = ray.getOrigin();
 
     // first check intersection with bounding object
-    if (!pBound->intersect(ray, t_min)) {
-        return false;
-    }
+    return pMesh->intersect_rev(ray, t_min, t_max, rand_state);
 
     for (int i = 0; i < repeat_limit; i++) {
         Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),

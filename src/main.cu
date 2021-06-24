@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     // Create the scene on GPU.
     printf("create_scene:\t");
     clock_t start = clock();
-    create_scene<<<1, 1>>>(
+    create_scene<<<1, 1, 49152>>>(
         p_scene, camera_params, sceneParser->getLightsParams(),
         sceneParser->getBaseGroupParams(), sceneParser->getMaterialsParams(),
         sceneParser->getBackgroundColor(), sceneParser->getEnvironmentColor());

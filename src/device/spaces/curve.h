@@ -38,10 +38,11 @@ public:
 
     __device__ bool IsFlat() const;
 
-    //__device__ virtual void discretize(int resolution, std::vector<CurvePoint> &data) =
-    // 0;
+    __device__ virtual int discretize(int resolution, Vector3f **points) = 0;
 
     __device__ virtual CurvePoint curve_point_at_t(float t) = 0;
+
+    __device__ virtual Vector3f point_at_t(float t) = 0;
 
     __device__ inline BoundingBox *get_bounding_box() { return pBox; }
 };

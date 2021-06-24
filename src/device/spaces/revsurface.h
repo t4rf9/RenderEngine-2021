@@ -1,14 +1,18 @@
 #ifndef REVSURFACE_HPP
 #define REVSURFACE_HPP
 
+#include <cmath>
+
 #include "BoundingBox.h"
 #include "BoundingObject.h"
 #include "curve.h"
+#include "mesh.h"
 #include "object3d.h"
 
 class RevSurface : public Object3D {
     Curve *pCurve;
-    BoundingBox *pBound = nullptr;
+    // BoundingBox *pBound = nullptr;
+    Mesh *pMesh;
 
 public:
     __device__ RevSurface(Curve *pCurve, Material *material);
