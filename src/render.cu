@@ -30,9 +30,6 @@ __global__ void render(Image *image, Scene **p_scene) {
             local_rand_state);
         Hit hit;
         // 判断ray是否和场景有交点，并返回最近交点的数据，存储在hit中
-        if (x == 200 && y == 110) {
-            x = 200;
-        }
         bool hasIntersection = baseGroup->intersect(ray, hit, 0.f, local_rand_state);
 
         if (hasIntersection) {

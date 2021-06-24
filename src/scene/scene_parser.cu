@@ -693,7 +693,9 @@ void SceneParser::parseBezierCurve(CurveParams *curve_params) {
     while (true) {
         getToken(token);
         if (!strcmp(token, "[")) {
-            controls.push_back(readVector3f());
+            Vector3f point = readVector3f();
+            point.x() = fabs(point.x());
+            controls.push_back(point);
             getToken(token);
             assert(!strcmp(token, "]"));
         } else if (!strcmp(token, "}")) {
@@ -727,7 +729,9 @@ void SceneParser::parseBsplineCurve(CurveParams *curve_params) {
     while (true) {
         getToken(token);
         if (!strcmp(token, "[")) {
-            controls.push_back(readVector3f());
+            Vector3f point = readVector3f();
+            point.x() = fabs(point.x());
+            controls.push_back(point);
             getToken(token);
             assert(!strcmp(token, "]"));
         } else if (!strcmp(token, "}")) {

@@ -122,7 +122,7 @@ __device__ int BsplineCurve::discretize(int resolution, Vector3f **points) {
         float step = (knots[i + 1] - knots[i]) / float(resolution);
         for (int j = 0; j <= resolution; j++) {
             float t = knots[i] + j * step;
-            *points[id++] = point_at_t(t);
+            (*points)[id++] = point_at_t(t);
         }
     }
 

@@ -27,20 +27,19 @@ __device__ RevSurface::RevSurface(Curve *pCurve, Material *material)
     Vector3f *higher = new Vector3f[angle_steps];
 
     lower[0] = curve_points[0];
-    lower[0].x() = fabs(lower[0].x());
+    lower[0].x() = lower[0].x();
     Vector3f min = lower[0];
     Vector3f max = lower[0];
     for (int i = 1; i < angle_steps; i++) {
         float t = (float)i * angle_step;
         Quat4f rot;
-        rot.setAxisAngle(t, Vector3f(0, 1, 0));
+        rot.setAxisAngle(t, Vector3f(0.f, -1.f, 0.f));
         lower[i] = Matrix3f::rotation(rot) * lower[0];
     }
     for (int ci = 1; ci < num_curve_points; ++ci) {
         // rotate
-        float t = 0.f;
         higher[0] = curve_points[ci];
-        higher[0].x() = fabs(higher[0].x());
+        higher[0].x() = higher[0].x();
 
         if (max.x() < higher[0].x()) {
             max.x() = higher[0].x();
@@ -117,42 +116,38 @@ __device__ bool RevSurface::intersect(const Ray &ray, Hit &hit, float t_min,
     Vector3f init_values = mesh_hit.getRevParams();
 
     bool res = false;
-    for (int i = 0; i < repeat_limit; i++) {
-        // Vector3f x(t_min + curand_uniform(&rand_state), curand_uniform(&rand_state),
-        //           20.f * curand_uniform(&rand_state) - 10.f);
-        Vector3f x(init_values[0], init_values[1], init_values[2]);
+    Vector3f x(init_values[0] * 0.9f, init_values[1], init_values[2]);
 
-        auto &t = x[0];
-        auto &u = x[1];
-        auto &v = x[2];
+    auto &t = x[0];
+    auto &u = x[1];
+    auto &v = x[2];
 
-        int count = 0;
-        while (count++ < iterate_limit && -10.f <= u && u <= 11.f && t >= t_min) {
-            float v2 = v * v;
-            float divisor = 1.f + v2;
-            float sinv = 2.f * v / divisor;
-            float cosv = (1.f - v2) / divisor;
-            CurvePoint f = pCurve->curve_point_at_t(u);
-            Vector3f F = o + t * d - Vector3f(cosv * f.V.x(), f.V.y(), sinv * f.V.x());
+    int count = 0;
+    while (count++ < iterate_limit && 0.f <= u && u <= 1.f && t >= t_min) {
+        float v2 = v * v;
+        float divisor = 1.f + v2;
+        float sinv = 2.f * v / divisor;
+        float cosv = (1.f - v2) / divisor;
+        CurvePoint f = pCurve->curve_point_at_t(u);
+        Vector3f F = o + t * d - Vector3f(cosv * f.V.x(), f.V.y(), sinv * f.V.x());
 
-            Vector3f T_y = Vector3f(cosv * f.T.x(), f.T.y(), sinv * f.T.x());
-            if (F.length() < 1e-6f) {
-                if (t <= t_min || t >= hit.getT()) {
-                    break;
-                }
-                Vector3f T_xz = Vector3f(-sinv, 0.f, cosv);
-                hit.set(t, material, Vector3f::cross(T_xz, T_y.normalized()));
-                res = true;
+        Vector3f T_y = Vector3f(cosv * f.T.x(), f.T.y(), sinv * f.T.x());
+        if (F.length() < 1e-5f) {
+            if (t <= t_min || t >= hit.getT()) {
                 break;
             }
-
-            Matrix3f F_prime = Matrix3f(d, -T_y,
-                                        Vector3f((2.f * sinv / divisor) * f.V[0], 0.f,
-                                                 -((2.f * cosv) / divisor) * f.V[0]));
-            Vector3f dx = F_prime.inverse() * F;
-
-            x -= dx;
+            Vector3f T_xz = Vector3f(-sinv, 0.f, cosv);
+            hit.set(t, material, Vector3f::cross(T_xz, T_y.normalized()));
+            res = true;
+            break;
         }
+
+        Matrix3f F_prime = Matrix3f(d, -T_y,
+                                    Vector3f((2.f * sinv / divisor) * f.V[0], 0.f,
+                                             -((2.f * cosv) / divisor) * f.V[0]));
+        Vector3f dx = F_prime.inverse() * F;
+
+        x -= dx;
     }
     return res;
 }
