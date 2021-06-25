@@ -40,12 +40,6 @@ public:
         normal = n;
     }
 
-    __device__ inline void set(float _t, const Vector3f &_color) {
-        t = _t;
-        material = nullptr;
-        color = _color;
-    }
-
     __device__ inline void set(float t, float u, float v) {
         rev_params[0] = t;
         rev_params[1] = u;

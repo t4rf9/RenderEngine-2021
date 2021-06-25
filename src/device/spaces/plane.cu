@@ -29,9 +29,9 @@ __device__ bool Plane::intersect(const Ray &ray, Hit &hit, float t_min,
     if (material->useTexture()) {
         Vector3f p = ray.pointAtParameter(t);
         Vector3f vec = p - texture_origin;
-        int x = Vector3f::dot(vec, texture_x);
-        int y = Vector3f::dot(vec, texture_y);
-        hit.set(t, material->getTextureColor(x, y));
+        int x = round(Vector3f::dot(vec, texture_x));
+        int y = round(Vector3f::dot(vec, texture_y));
+        hit.set(t, material, material->getTextureColor(x, y));
     } else {
         hit.set(t, material, normal);
     }
