@@ -1,16 +1,20 @@
 #pragma once
 
+#include "axis.h"
 #include "space.h"
 
 class BSPNode : public Space {
-private:
-    enum Axis { X = 0, Y = 1, Z = 2 } axis;
+public:
+    Axis axis;
     float value;
-    Space *lChild;
-    Space *rChild;
+    Space *lChild = nullptr;
+    Space *rChild = nullptr;
 
 public:
+    __device__ BSPNode();
+
     __device__ BSPNode(Axis axis, float value);
+
     __device__ ~BSPNode();
 
     __device__ virtual bool intersect(const Ray &ray, Hit &hit, float t_min,

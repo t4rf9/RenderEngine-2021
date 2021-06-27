@@ -2,8 +2,11 @@
 
 #include <vecmath.h>
 
+#include "BSPNode.h"
 #include "BoundingBox.h"
+#include "axis.h"
 #include "define.h"
+#include "group.h"
 #include "object3d.h"
 #include "triangle.h"
 
@@ -28,8 +31,11 @@ public:
 
 private:
     float curve_step;
+
     int num_triangles;
     Triangle **triangles;
+
+    Space *pRoot;
 
     BoundingBox *pBox;
 };

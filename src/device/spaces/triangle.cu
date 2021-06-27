@@ -1,8 +1,8 @@
 #include "triangle.h"
 
 __device__ Triangle::Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c,
-                              Material *m)
-    : Object3D(m) {
+                              Material *m, int id)
+    : Object3D(m), center((a + b + c) / 3.f), id(id) {
     vertices[0] = a;
     vertices[1] = b;
     vertices[2] = c;
@@ -10,6 +10,47 @@ __device__ Triangle::Triangle(const Vector3f &a, const Vector3f &b, const Vector
     E2 = vertices[0] - vertices[2];
     normal = Vector3f::cross(E1, E2);
     normal.normalize();
+
+    min = vertices[0];
+    max = vertices[0];
+
+    if (vertices[1].x() < min.x()) {
+        min.x() = vertices[1].x();
+    }
+    if (vertices[1].y() < min.y()) {
+        min.y() = vertices[1].y();
+    }
+    if (vertices[1].z() < min.z()) {
+        min.z() = vertices[1].z();
+    }
+    if (vertices[1].x() > max.x()) {
+        max.x() = vertices[1].x();
+    }
+    if (vertices[1].y() > max.y()) {
+        max.y() = vertices[1].y();
+    }
+    if (vertices[1].z() > max.z()) {
+        max.z() = vertices[1].z();
+    }
+
+    if (vertices[2].x() < min.x()) {
+        min.x() = vertices[2].x();
+    }
+    if (vertices[2].y() < min.y()) {
+        min.y() = vertices[2].y();
+    }
+    if (vertices[2].z() < min.z()) {
+        min.z() = vertices[2].z();
+    }
+    if (vertices[2].x() > max.x()) {
+        max.x() = vertices[2].x();
+    }
+    if (vertices[2].y() > max.y()) {
+        max.y() = vertices[2].y();
+    }
+    if (vertices[2].z() > max.z()) {
+        max.z() = vertices[2].z();
+    }
 }
 
 __device__ bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min,
@@ -40,6 +81,7 @@ __device__ bool Triangle::intersect(const Ray &ray, Hit &hit, float t_min,
     }
 
     hit.set(t, material, normal);
+    hit.id = id;
 
     return true;
 }

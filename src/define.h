@@ -24,3 +24,6 @@ const float angle_step = 2.f * M_PIf32 / (float)angle_steps;
 
 const int repeat_limit = 1;
 const int iterate_limit = 20;
+
+const int max_BSP_depth = 12;
+const int max_BSP_leaf_size = 68;

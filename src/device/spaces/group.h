@@ -8,7 +8,9 @@ class Group : public Object3D {
 public:
     __device__ Group() = delete;
 
-    __device__ explicit Group(int num_objects);
+    __device__ explicit Group(int capacity);
+
+    __device__ Group(int num_objects, Object3D **objects);
 
     __device__ ~Group() override;
 
@@ -18,13 +20,15 @@ public:
     __device__ virtual bool intersect(const Ray &ray, float t_min, float t_max,
                                       RandState &rand_state) override;
 
-    __device__ void addObject(int index, Object3D *obj);
+    __device__ void addObject(Object3D *obj);
 
     __device__ inline Object3D *getObject(int index) const { return objects[index]; }
 
     __device__ inline int getGroupSize() { return num_objects; }
 
-private:
+    __device__ void shrink_to_fit();
+
     int num_objects;
+    int capacity;
     Object3D **objects;
 };

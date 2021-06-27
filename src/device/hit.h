@@ -47,6 +47,8 @@ public:
         material = nullptr;
     }
 
+    int id;
+
 private:
     float t;
     Material *material;

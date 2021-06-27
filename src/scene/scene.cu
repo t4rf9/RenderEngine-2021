@@ -241,7 +241,7 @@ __device__ Scene::Scene(CameraParams *camera_params, LightsParams *lights_params
                 object = nullptr;
                 break;
             }
-            group->addObject(i, object);
+            group->addObject(object);
         }
 
         GroupListNode *tmp = group_node;

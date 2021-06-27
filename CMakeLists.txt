@@ -28,6 +28,7 @@ ADD_EXECUTABLE(main
 
         src/device/spaces/space.h src/device/spaces/space.cu
         src/device/spaces/group.h src/device/spaces/group.cu
+        src/device/spaces/axis.h
         src/device/spaces/mesh.h src/device/spaces/mesh.cu
         src/device/spaces/object3d.h src/device/spaces/object3d.cu
         src/device/spaces/plane.h src/device/spaces/plane.cu
@@ -90,6 +91,7 @@ src/device/material.h src/device/material.cu
 
 src/device/spaces/space.h src/device/spaces/space.cu
 src/device/spaces/group.h src/device/spaces/group.cu
+src/device/spaces/axis.h
 src/device/spaces/mesh.h src/device/spaces/mesh.cu
 src/device/spaces/object3d.h src/device/spaces/object3d.cu
 src/device/spaces/plane.h src/device/spaces/plane.cu
@@ -141,7 +143,7 @@ set_property(TARGET main PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 set_property(TARGET test PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 set_property(TARGET vecmath PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
-# target_compile_options(main PUBLIC -G -g)
+#target_compile_options(main PUBLIC -G -g)
 target_compile_options(main PUBLIC --std=c++17)
 target_compile_options(test PUBLIC --std=c++17)
 

@@ -37,7 +37,11 @@ int main(int argc, char *argv[]) {
     std::string outputFile = argv[2]; // only bmp is allowed.
 
     // First, parse the scene using SceneParser.
+    printf("parse scene:\t");
+    fflush(stdout);
+    clock_t start = clock();
     SceneParser *sceneParser = new SceneParser(inputFile.c_str());
+    printf("%lf s\n", double(clock() - start) / CLOCKS_PER_SEC);
     if (debug)
         printf("sceneParser:\t0x%lx\n", sceneParser);
 
@@ -53,11 +57,13 @@ int main(int argc, char *argv[]) {
     int height = camera_params->height;
     Image *image = new Image(camera_params->width, camera_params->height);
 
-    checkCudaErrors(cudaDeviceSetLimit(cudaLimitStackSize, 2048));
+    checkCudaErrors(cudaDeviceSetLimit(cudaLimitStackSize, 4096));
+    checkCudaErrors(cudaDeviceSetLimit(cudaLimitMallocHeapSize, (1 << 30)));
 
     // Create the scene on GPU.
     printf("create_scene:\t");
-    clock_t start = clock();
+    fflush(stdout);
+    start = clock();
     create_scene<<<1, 1, 49152>>>(
         p_scene, camera_params, sceneParser->getLightsParams(),
         sceneParser->getBaseGroupParams(), sceneParser->getMaterialsParams(),
@@ -74,6 +80,7 @@ int main(int argc, char *argv[]) {
     dim3 num_blocks((width + block_size.x - 1) / block_size.x,
                     (height + block_size.y - 1) / block_size.y);
     printf("render:\t\t");
+    fflush(stdout);
     start = clock();
     render<<<num_blocks, block_size, 49152>>>(image, p_scene);
     checkCudaErrors(cudaDeviceSynchronize());
@@ -81,6 +88,7 @@ int main(int argc, char *argv[]) {
 
     // Delete the scene on GPU.
     printf("destroy_scene:\t");
+    fflush(stdout);
     start = clock();
     destroy_scene<<<1, 1>>>(p_scene);
     checkCudaErrors(cudaDeviceSynchronize());
